@@ -1,0 +1,19 @@
+[[clusters]]
+keys = ["<KEY>"]
+arn = "arn:aws:ecs:eu-central-1:<ACCOUNT_ID>:cluster/<CLUSTER_NAME>"
+services = [
+  "service-a",
+  "service-b"
+]
+config_source = "env"
+
+# --- #
+
+[[clusters]]
+keys = ["<KEY>"]
+arn = "arn:aws:ecs:eu-central-1:<ACCOUNT_ID>:cluster/<CLUSTER_NAME>"
+services = [
+  "service-a",
+  "service-b"
+]
+config_source = "profile:<PROFILE_NAME>"

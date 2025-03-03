@@ -1,0 +1,21 @@
+Keymaps
+---
+
+General
+    ?                    show/hide help view
+    Esc / q              go back/exit
+    <ctrl+c>             exit immediately
+
+Main View
+    j / ↓                go down in a list
+    k / ↑                go up in a list
+    H / ←                move to the pane to the left
+    J / Tab              move to the pane below
+    K / <S-Tab>          move to the pane above
+    L / →                move to the pane to the right
+    r                    refresh details for current item
+    <c-r>                refresh data (either the ones marked, or all)
+    R                    toggle auto refresh (for either the ones marked, or all)
+
+Services List
+    m                    mark service for auto refresh
