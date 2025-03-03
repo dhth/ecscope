@@ -2,6 +2,9 @@
   <h1 align="center">ecscope</h1>
   <p align="center">
     <a href="https://github.com/dhth/ecscope/actions/workflows/build.yml"><img alt="GitHub release" src="https://img.shields.io/github/actions/workflow/status/dhth/ecscope/build.yml?style=flat-square"></a>
+    <a href="https://crates.io/crates/ecscope"><img alt="GitHub release" src="https://img.shields.io/crates/v/ecscope?style=flat-square"></a>
+    <a href="https://github.com/dhth/ecscope/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/release/dhth/ecscope.svg?style=flat-square"></a>
+    <a href="https://github.com/dhth/ecscope/releases"><img alt="Commits since latest release" src="https://img.shields.io/github/commits-since/dhth/ecscope/latest?style=flat-square"></a>
   </p>
 </p>
 
@@ -18,11 +21,21 @@ deployments in one place. You can group services by configuring them via a
 💾 Installation
 ---
 
+**homebrew**:
+
+```sh
+brew install dhth/tap/ecscope
+```
+
 **cargo**:
 
 ```sh
-cargo install --git https://github.com/dhth/ecscope.git
+cargo install ecscope
 ```
+
+Or get the binaries directly from a Github [release][1]. Read more about
+verifying the authenticity of released artifacts
+[here](#-verifying-release-artifacts).
 
 ⚡️ Usage
 ---
@@ -166,3 +179,41 @@ ecscope monitor profile -k 'qa|staging'
 # combine both filters
 ecscope monitor profile -s '.*-service' -k 'qa'
 ```
+
+🔐 Verifying release artifacts
+---
+
+In case you get the `ecscope` binary directly from a [release][1], you may want
+to verify its authenticity. Checksums are applied to all released artifacts, and
+the resulting checksum file is attested using [Github Attestations][2].
+
+Steps to verify (replace `A.B.C` in the commands below with the version you
+want):
+
+1. Download the sha256 checksum file for your platform from the release:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/ecscope/releases/download/vA.B.C/ecscope-x86_64-unknown-linux-gnu.tar.xz.sha256
+   ```
+
+2. Verify the integrity of the checksum file using [gh][3].
+
+   ```shell
+   gh attestation verify ecscope-x86_64-unknown-linux-gnu.tar.xz.sha256 --repo dhth/ecscope
+   ```
+
+3. Download the compressed archive you want, and validate its checksum:
+
+   ```shell
+   curl -sSLO https://github.com/dhth/ecscope/releases/download/vA.B.C/ecscope-x86_64-unknown-linux-gnu.tar.xz
+   sha256sum --ignore-missing -c ecscope-x86_64-unknown-linux-gnu.tar.xz.sha256
+   ```
+
+3. If checksum validation goes through, uncompress the archive:
+
+   ```shell
+   tar -xzf ecscope-x86_64-unknown-linux-gnu.tar.xz
+   cd ecscope-x86_64-unknown-linux-gnu
+   ./ecscope
+   # profit!
+   ```
