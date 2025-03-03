@@ -7,15 +7,13 @@
 
 `ecscope` lets you monitor AWS ECS resources from the terminal.
 
-https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9
+![tui](https://github.com/user-attachments/assets/c7d7f005-f582-4eff-a685-dc8d3c8e0b61)
 
-🤔 Motivation
----
-
-At work, we run multiple ECS services deployed across several accounts and
-environments. Accessing each service through the AWS UI — which often requires
-logging into separate accounts — is tedious and time-consuming. I needed a more
-efficient way to access ECS deployment updates.
+It does so by offering a TUI which shows services, tasks and containers in a
+single view. Instead of having to log into several accounts (or change regions)
+via the AWS website, you're able to view relevant information for ECS
+deployments in one place. You can group services by configuring them via a
+"profile", and have `ecscope` load it up.
 
 💾 Installation
 ---
@@ -41,6 +39,8 @@ Options:
       --debug  Output debug information without doing anything
   -h, --help   Print help
 ```
+
+https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9
 
 📃 Profiles
 ---
@@ -112,8 +112,6 @@ authentication and configuration.
 
 📟 Monitoring TUI
 ---
-
-![tui-2](https://github.com/user-attachments/assets/c7d7f005-f582-4eff-a685-dc8d3c8e0b61)
 
 Once a profile is configured, you can begin monitoring ECS deployments via
 `ecscope`'s TUI.
