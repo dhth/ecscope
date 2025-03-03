@@ -1,0 +1,28 @@
+name: back-compat
+
+on:
+  push:
+    branches: ["main"]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  back-compat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - run: git checkout HEAD~1
+      - name: Build last commit
+        run: cargo build --target-dir /var/tmp/last
+      - name: Add profile with ecscope on last commit
+        run: /var/tmp/last/debug/ecscope profiles add prof1
+      - run: git checkout main
+      - name: Build head
+        run: cargo build --target-dir /var/tmp/head
+      - name: Run ecscope on head
+        run: /var/tmp/head/debug/ecscope monitor prof1 --debug
