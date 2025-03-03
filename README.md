@@ -217,3 +217,7 @@ want):
    ./ecscope
    # profit!
    ```
+
+[1]: https://github.com/dhth/ecscope/releases
+[2]: https://github.blog/news-insights/product-news/introducing-artifact-attestations-now-in-public-beta/
+[3]: https://github.com/cli/cli
