@@ -7,7 +7,7 @@
 
 `ecscope` lets you monitor AWS ECS resources from the terminal.
 
-![tui-2](https://github.com/user-attachments/assets/c7d7f005-f582-4eff-a685-dc8d3c8e0b61)
+https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9
 
 🤔 Motivation
 ---
@@ -113,7 +113,7 @@ authentication and configuration.
 📟 Monitoring TUI
 ---
 
-![tui](https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9)
+![tui-2](https://github.com/user-attachments/assets/c7d7f005-f582-4eff-a685-dc8d3c8e0b61)
 
 Once a profile is configured, you can begin monitoring ECS deployments via
 `ecscope`'s TUI.
