@@ -1,3 +1,4 @@
+use crate::common::{DeploymentState, OutputFormat};
 use clap::{Parser, Subcommand};
 use regex::Regex;
 
@@ -15,6 +16,29 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum EcscopeCommand {
+    /// List ECS deployments
+    Deployments {
+        /// Profile to use
+        #[arg(value_name = "PROFILE")]
+        profile_name: String,
+        /// Filtration query for service names
+        #[arg(short = 's', long = "service-filter", value_name = "REGEX", value_parser=validate_filter_query)]
+        service_name_filter: Option<Regex>,
+        /// Filtration query for cluster keys
+        #[arg(short = 'k', long = "key-filter", value_name = "REGEX", value_parser=validate_filter_query)]
+        key_filter: Option<Regex>,
+        /// Deployment state to query for
+        #[arg(long = "state", value_name = "STRING")]
+        state: Option<DeploymentState>,
+        /// Format to use
+        #[arg(
+            short = 'f',
+            long = "format",
+            value_name = "STRING",
+            default_value = "json"
+        )]
+        format: OutputFormat,
+    },
     /// Manage ecscope's profiles
     Profiles {
         #[command(subcommand)]
@@ -25,10 +49,10 @@ pub enum EcscopeCommand {
         /// Profile to use
         #[arg(value_name = "PROFILE")]
         profile_name: String,
-        /// Filteration query for service names
+        /// Filtration query for service names
         #[arg(short = 's', long = "service-filter", value_name = "REGEX", value_parser=validate_filter_query)]
         service_name_filter: Option<Regex>,
-        /// Filteration query for cluster keys
+        /// Filtration query for cluster keys
         #[arg(short = 'k', long = "key-filter", value_name = "REGEX", value_parser=validate_filter_query)]
         key_filter: Option<Regex>,
     },
@@ -49,6 +73,29 @@ pub enum ProfilesCommand {
 impl std::fmt::Display for Args {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let output = match &self.command {
+            EcscopeCommand::Deployments {
+                profile_name,
+                service_name_filter,
+                key_filter,
+                state,
+                format,
+            } => format!(
+                r#"
+command             : List Deployments
+profile             : {}
+service name filter : {}
+key filter          : {}
+state               : {}
+format              : {}
+"#,
+                profile_name,
+                service_name_filter
+                    .as_ref()
+                    .map_or(NOT_PROVIDED, |s| s.as_str()),
+                key_filter.as_ref().map_or(NOT_PROVIDED, |r| r.as_str()),
+                state.as_ref().map_or(NOT_PROVIDED, |s| s.as_ref()),
+                format,
+            ),
             EcscopeCommand::Profiles { profiles_command } => match profiles_command {
                 ProfilesCommand::Add { name } => format!(
                     r#"

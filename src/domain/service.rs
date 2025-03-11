@@ -14,6 +14,7 @@ pub struct ServiceError {
     pub error: String,
     pub cluster_keys: Vec<String>,
 }
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct ServiceDetails {
     pub name: String,

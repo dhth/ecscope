@@ -1,9 +1,10 @@
 use crate::args::{Args, EcscopeCommand, ProfilesCommand};
-use crate::cmds::{add_profile, list_profiles, run_monitor};
+use crate::cmds::{add_profile, list_deployments, list_profiles, run_monitor};
 use crate::debug::display_debug_info;
 use crate::errors::AppError;
-use crate::utils::get_config_dir;
+use crate::utils::{get_clusters, get_config_dir};
 use std::path::PathBuf;
+use std::sync::Arc;
 
 const TOOL_DIR: &str = "ecscope";
 
@@ -17,6 +18,24 @@ pub async fn handle(args: Args) -> Result<(), AppError> {
     }
 
     match args.command {
+        EcscopeCommand::Deployments {
+            profile_name,
+            service_name_filter,
+            key_filter,
+            state,
+            format,
+        } => {
+            if let Some((clients_map, clusters)) = get_clusters(
+                &config_dir,
+                profile_name.clone(),
+                service_name_filter,
+                key_filter,
+            )
+            .await?
+            {
+                list_deployments(clusters, Arc::new(clients_map), state, format).await?;
+            }
+        }
         EcscopeCommand::Profiles { profiles_command } => match profiles_command {
             ProfilesCommand::Add { name } => add_profile(&config_dir, name, false)?,
             ProfilesCommand::List => list_profiles(&config_dir)?,
@@ -25,7 +44,18 @@ pub async fn handle(args: Args) -> Result<(), AppError> {
             profile_name,
             service_name_filter,
             key_filter,
-        } => run_monitor(&config_dir, profile_name, service_name_filter, key_filter).await?,
+        } => {
+            if let Some((clients_map, clusters)) = get_clusters(
+                &config_dir,
+                profile_name.clone(),
+                service_name_filter,
+                key_filter,
+            )
+            .await?
+            {
+                run_monitor(profile_name.clone(), clients_map, clusters).await?;
+            }
+        }
     }
 
     Ok(())
