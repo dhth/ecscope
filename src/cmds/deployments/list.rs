@@ -160,7 +160,7 @@ async fn deployments_for_cluster(
                         running_count: dep.running_count(),
                         desired_count: dep.desired_count(),
                         pending_count: dep.pending_count(),
-                        num_failed_tasks: dep.failed_tasks(),
+                        failed_count: dep.failed_tasks(),
                     }));
                 }
             }

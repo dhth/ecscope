@@ -35,7 +35,7 @@ pub struct DeploymentDetails {
     pub running_count: i32,
     pub desired_count: i32,
     pub pending_count: i32,
-    pub num_failed_tasks: i32,
+    pub failed_count: i32,
 }
 
 impl std::fmt::Display for DeploymentDetails {
@@ -61,7 +61,7 @@ Failed tasks   : {}
             self.running_count,
             self.desired_count,
             self.pending_count,
-            self.num_failed_tasks,
+            self.failed_count,
         )?;
 
         Ok(())
