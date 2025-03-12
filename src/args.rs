@@ -17,6 +17,7 @@ pub struct Args {
 #[derive(Subcommand, Debug)]
 pub enum EcscopeCommand {
     /// List ECS deployments
+    #[command(name = "deps")]
     Deployments {
         /// Profile to use
         #[arg(value_name = "PROFILE")]

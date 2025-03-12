@@ -13,7 +13,7 @@ impl std::fmt::Display for DeploymentError {
             r#"
 Service     : {}
 Cluster ARN : {}
-Cluster Keys: {:?}
+Keys        : {:?}
 Error       : {}"
 "#,
             self.service_name, self.cluster_arn, self.cluster_keys, self.error,
@@ -23,11 +23,12 @@ Error       : {}"
     }
 }
 
+pub type DeploymentResult = Result<DeploymentDetails, DeploymentError>;
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone, serde::Serialize)]
 pub struct DeploymentDetails {
     pub service_name: String,
-    #[serde(skip)]
-    pub cluster_keys: Vec<String>,
+    pub keys: String,
     pub cluster_arn: String,
     pub deployment_id: String,
     pub status: String,
@@ -42,15 +43,19 @@ impl std::fmt::Display for DeploymentDetails {
         write!(
             f,
             r#"
-service        : {}
-deployment id  : {}
-status         : {}
-running count  : {}
-desired count  : {}
-pending count  : {}
-failed tasks   : {}
+Service        : {}
+Keys           : {}
+Cluster arn    : {}
+Deployment id  : {}
+Status         : {}
+Running count  : {}
+Desired count  : {}
+Pending count  : {}
+Failed tasks   : {}
 "#,
             self.service_name,
+            self.keys,
+            self.cluster_arn,
             self.deployment_id,
             self.status,
             self.running_count,
