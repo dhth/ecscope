@@ -65,7 +65,7 @@ profile is simply configuration that groups together ECS resources you want to
 monitor in one go. You set up a profile using:
 
 ```bash
-ecscope profiles add <PROFILE_NAME>
+ecscope profiles add <PROFILE>
 ```
 
 This will generate a TOML file in your config directory that looks like this:
@@ -80,8 +80,6 @@ services = [
 ]
 config_source = "env"
 
-# --- #
-
 [[clusters]]
 keys = ["<KEY>"]
 arn = "arn:aws:ecs:eu-central-1:<ACCOUNT_ID>:cluster/<CLUSTER_NAME>"
@@ -89,7 +87,7 @@ services = [
   "service-a",
   "service-b"
 ]
-config_source = "profile:<PROFILE_NAME>"
+config_source = "profile:<PROFILE>"
 ```
 
 ### Listing profiles
@@ -121,7 +119,119 @@ config](https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html) for
 authentication and configuration.
 
 `ecscope` can be configured to use this option by setting `config_source` to
-`"profile:<PROFILE_NAME>"` in the profile config.
+`"profile:<PROFILE>"` in the profile config.
+
+⏳ Deployments
+---
+
+ECS deployments can be viewed using the `deps` command.
+
+```text
+$ ecscope deps -h
+
+Usage: ecscope deps [OPTIONS] <PROFILE>
+
+Arguments:
+  <PROFILE>  Profile to use
+
+Options:
+  -s, --service-filter <REGEX>  Filtration query for service names
+  -k, --key-filter <REGEX>      Filtration query for cluster keys
+      --state <STRING>          Deployment state to query for [possible values: finished, pending, failing]
+      --debug                   Output debug information without doing anything
+  -f, --format <STRING>         Format to use [default: json] [possible values: delimited, json, plain]
+  -h, --help                    Print help (see more with '--help')
+```
+
+```bash
+ecscope deps <PROFILE>
+
+# filter by cluster keys
+ecscope deps <PROFILE> -k prod
+
+# filter by cluster keys
+ecscope deps <PROFILE> -k '(qa|prod)'
+
+# filter by service names
+ecscope deps <PROFILE> -s '.*-service'
+
+# only show deployments that are finished
+ecscope deps <PROFILE> --state finished
+
+# only show deployments that are pending
+ecscope deps <PROFILE> --state pending
+
+# only show deployments that are failing
+ecscope deps <PROFILE> --state failing
+```
+
+By default, the `deps` command outputs results in the JSON format.
+
+<details><summary> Sample output</summary>
+
+```bash
+ecscope deps <PROFILE> -s auth
+```
+
+```json
+[
+  {
+    "service_name": "authentication-service",
+    "keys": "qa",
+    "cluster_arn": "arn:aws:ecs:eu-central-1:<REDACTED>:cluster/authentication-service-infrastructure-qa",
+    "deployment_id": "ecs-svc/<REDACTED>",
+    "status": "PRIMARY",
+    "running_count": 3,
+    "desired_count": 3,
+    "pending_count": 0,
+    "failed_count": 0
+  },
+  {
+    "service_name": "authentication-service",
+    "keys": "staging",
+    "cluster_arn": "arn:aws:ecs:eu-central-1:<REDACTED>:cluster/authentication-service-infrastructure-staging",
+    "deployment_id": "ecs-svc/<REDACTED>",
+    "status": "PRIMARY",
+    "running_count": 1,
+    "desired_count": 1,
+    "pending_count": 0,
+    "failed_count": 0
+  },
+  {
+    "service_name": "authentication-service",
+    "keys": "prod",
+    "cluster_arn": "arn:aws:ecs:eu-central-1:<REDACTED>:cluster/authentication-service-infrastructure-prod",
+    "deployment_id": "ecs-svc/<REDACTED>",
+    "status": "PRIMARY",
+    "running_count": 3,
+    "desired_count": 3,
+    "pending_count": 0,
+    "failed_count": 0
+  }
+]
+```
+</details>
+
+### Tabular Output
+
+You can view the output of `deps` command as a table as follows (uses
+[tbll](https://github.com/dhth/tbll)):
+
+```bash
+ecscope deps <PROFILE> -s auth -f delimited |
+    (read -r header && echo "$header" && sort) |
+    tbll -c 0,1,4,5,6,7,8
+```
+
+```text
+┌────────────────────────┬─────────┬─────────┬───────────────┬───────────────┬───────────────┬──────────────┐
+│ service_name           │ keys    │ status  │ running_count │ desired_count │ pending_count │ failed_count │
+├────────────────────────┼─────────┼─────────┼───────────────┼───────────────┼───────────────┼──────────────┤
+│ authentication-service │ prod    │ PRIMARY │ 3             │ 3             │ 0             │ 0            │
+│ authentication-service │ qa      │ PRIMARY │ 3             │ 3             │ 0             │ 0            │
+│ authentication-service │ staging │ PRIMARY │ 1             │ 1             │ 0             │ 0            │
+└────────────────────────┴─────────┴─────────┴───────────────┴───────────────┴───────────────┴──────────────┘
+```
 
 📟 Monitoring TUI
 ---
@@ -129,8 +239,19 @@ authentication and configuration.
 Once a profile is configured, you can begin monitoring ECS deployments via
 `ecscope`'s TUI.
 
-```bash
-ecscope monitor <PROFILE_NAME>
+```text
+$ ecscope monitor -h
+
+Usage: ecscope monitor [OPTIONS] <PROFILE>
+
+Arguments:
+  <PROFILE>  Profile to use
+
+Options:
+  -s, --service-filter <REGEX>  Filtration query for service names
+  -k, --key-filter <REGEX>      Filtration query for cluster keys
+      --debug                   Output debug information without doing anything
+  -h, --help                    Print help
 ```
 
 The TUI displays running tasks for each configured service, along with their

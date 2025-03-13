@@ -1,6 +1,7 @@
 mod args;
 mod aws;
 mod cmds;
+mod common;
 mod config;
 mod debug;
 mod domain;
