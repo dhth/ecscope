@@ -44,6 +44,7 @@ verifying the authenticity of released artifacts
 Usage: ecscope [OPTIONS] <COMMAND>
 
 Commands:
+  deps      List ECS deployments
   profiles  Manage ecscope's profiles
   monitor   Open monitoring TUI
   help      Print this message or the help of the given subcommand(s)
@@ -53,7 +54,7 @@ Options:
   -h, --help   Print help
 ```
 
-https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9
+<video src='https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9' />
 
 📃 Profiles
 ---
