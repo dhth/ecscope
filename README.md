@@ -54,7 +54,7 @@ Options:
   -h, --help   Print help
 ```
 
-<video src='https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9' />
+<video src="https://github.com/user-attachments/assets/5abea06a-0749-4e5c-9ac8-3811c895a5c9"></video>
 
 📃 Profiles
 ---
