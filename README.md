@@ -340,6 +340,12 @@ want):
    # profit!
    ```
 
+≈ Related tools
+---
+
+- [ecsv](https://github.com/dhth/ecsv) lets you quickly check the versions of
+  your systems running in ECS tasks across various environments
+
 [1]: https://github.com/dhth/ecscope/releases
 [2]: https://github.blog/news-insights/product-news/introducing-artifact-attestations-now-in-public-beta/
 [3]: https://github.com/cli/cli
