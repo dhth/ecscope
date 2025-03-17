@@ -5,6 +5,8 @@ services = [
   "service-a",
   "service-b"
 ]
+# use this to provide configuration and credentials via environment variables
+# https://docs.aws.amazon.com/sdkref/latest/guide/environment-variables.html
 config_source = "env"
 
 [[clusters]]
@@ -14,4 +16,17 @@ services = [
   "service-a",
   "service-b"
 ]
+# use this to leverage a profile contained in the shared AWS config and credentials files
+# https://docs.aws.amazon.com/sdkref/latest/guide/file-format.html
 config_source = "profile:<PROFILE_NAME>"
+
+[[clusters]]
+keys = ["<KEY>"]
+arn = "arn:aws:ecs:eu-central-1:<ACCOUNT_ID>:cluster/<CLUSTER_NAME>"
+services = [
+  "service-a",
+  "service-b"
+]
+# use this when you want to provide configuration and credentials via environment variables
+# but want to assume another role for performing the actual operations
+config_source = "assume:<IAM_ROLE_ARN>"
