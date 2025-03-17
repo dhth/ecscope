@@ -30,7 +30,8 @@ impl<'de> Deserialize<'de> for ConfigSource {
             type Value = ConfigSource;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-                formatter.write_str(r#"either "default" or "profile:<profile_name>""#)
+                formatter
+                    .write_str(r#"either "env" or "profile:<profile_name>" or "assume:<role_arn>""#)
             }
 
             fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
@@ -43,6 +44,10 @@ impl<'de> Deserialize<'de> for ConfigSource {
                     #[allow(clippy::unwrap_used)]
                     let profile_name = value.strip_prefix("profile:").unwrap().to_string();
                     Ok(ConfigSource::Profile { name: profile_name })
+                } else if value.starts_with("assume:") {
+                    #[allow(clippy::unwrap_used)]
+                    let role_arn = value.strip_prefix("assume:").unwrap().to_string();
+                    Ok(ConfigSource::AssumeRole { role_arn })
                 } else {
                     Err(de::Error::invalid_value(de::Unexpected::Str(value), &self))
                 }
@@ -55,6 +60,7 @@ impl<'de> Deserialize<'de> for ConfigSource {
 
 #[derive(Eq, Hash, PartialEq, Debug, Clone)]
 pub enum ConfigSource {
+    AssumeRole { role_arn: String },
     Env,
     Profile { name: String },
 }
@@ -120,18 +126,35 @@ services = [
   "service-d",
 ]
 config_source = "profile:qa"
+
+# --- #
+
+[[clusters]]
+keys = ["qa"]
+arn = "arn:aws:ecs:eu-central-1:111111111111:cluster/prlserver-cluster-qa"
+services = [
+  "service-c",
+  "service-d",
+]
+config_source = "assume:arn:aws:iam::222222222222:role/role-name"
 "#;
 
         // WHEN
         let config: Config = toml::from_str(config).expect("config should've been deserialized");
 
         // THEN
-        assert_eq!(config.clusters.len(), 2);
+        assert_eq!(config.clusters.len(), 3);
         assert_eq!(config.clusters[0].config_source, ConfigSource::Env);
         assert_eq!(
             config.clusters[1].config_source,
             ConfigSource::Profile {
                 name: "qa".to_string()
+            }
+        );
+        assert_eq!(
+            config.clusters[2].config_source,
+            ConfigSource::AssumeRole {
+                role_arn: "arn:aws:iam::222222222222:role/role-name".to_string()
             }
         );
     }
