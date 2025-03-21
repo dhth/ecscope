@@ -52,3 +52,37 @@ impl std::fmt::Display for DeploymentState {
         Ok(())
     }
 }
+
+#[derive(Clone, Debug, ValueEnum)]
+pub enum OutputMode {
+    /// Default one time output to stdout
+    Default,
+    /// Web view
+    Web,
+}
+
+impl std::fmt::Display for OutputMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let value = match self {
+            OutputMode::Default => "default",
+            OutputMode::Web => "web",
+        };
+
+        write!(f, "{}", value)?;
+
+        Ok(())
+    }
+}
+
+#[derive(Clone)]
+pub enum Environment {
+    Dev,
+    Prod,
+}
+
+pub fn get_env() -> Environment {
+    match std::env::var("ECSCOPE_DEV").unwrap_or_default().as_str() {
+        "1" => Environment::Dev,
+        _ => Environment::Prod,
+    }
+}

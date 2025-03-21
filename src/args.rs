@@ -1,4 +1,4 @@
-use crate::common::{DeploymentState, OutputFormat};
+use crate::common::{DeploymentState, OutputFormat, OutputMode};
 use clap::{Parser, Subcommand};
 use regex::Regex;
 
@@ -39,6 +39,12 @@ pub enum EcscopeCommand {
             default_value = "json"
         )]
         format: OutputFormat,
+        /// Output mode
+        #[arg(short = 'm', long = "mode")]
+        mode: OutputMode,
+        /// Whether to skip opening web results in browser (when --mode=web)
+        #[arg(long = "web-skip-opening")]
+        web_skip_opening: bool,
     },
     /// Manage ecscope's profiles
     Profiles {
@@ -80,14 +86,18 @@ impl std::fmt::Display for Args {
                 key_filter,
                 state,
                 format,
+                mode,
+                web_skip_opening,
             } => format!(
                 r#"
-command             : List Deployments
-profile             : {}
-service name filter : {}
-key filter          : {}
-state               : {}
-format              : {}
+command                  : List Deployments
+profile                  : {}
+service name filter      : {}
+key filter               : {}
+state                    : {}
+format                   : {}
+mode                     : {}
+skip opening web results : {}
 "#,
                 profile_name,
                 service_name_filter
@@ -96,6 +106,8 @@ format              : {}
                 key_filter.as_ref().map_or(NOT_PROVIDED, |r| r.as_str()),
                 state.as_ref().map_or(NOT_PROVIDED, |s| s.as_ref()),
                 format,
+                mode,
+                web_skip_opening,
             ),
             EcscopeCommand::Profiles { profiles_command } => match profiles_command {
                 ProfilesCommand::Add { name } => format!(

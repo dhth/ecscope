@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ecscope</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/deps.css">
+    <link rel="icon" href="assets/favicon.png" type="image/png">
+  </head>
+  <body class="bg-[#282828] text-[#ebdbb2]">
+    <div class="container">
+      <h1 id="page-title" class="text-3xl font-bold mb-6">ecscope</h1>
+      <div class="mb-4 flex items-center space-x-4">
+        <div class="flex items-center space-x-2 py-2 px-4 border border-[#3d3d3d] rounded bg-[#282828]">
+          <label class="flex items-center space-x-2">
+            <input id="refresh-toggle" type="checkbox" class="w-4 h-4 text-[#fabd2f] border-[#3c3836] bg-[#282828] rounded focus:ring-[#fabd2f]">
+            <span>Auto refresh every</span>
+          </label>
+          <input id="refresh-interval" type="number" class="w-12 h-8 text-center text-[#ebdbb2] bg-[#3c3836] border-[#504945] rounded focus:ring-[#fabd2f]" 
+            min="5" max="300" value="3" disabled>
+          <span>seconds</span>
+        </div>
+        <div>
+          <button id="manual-refresh" class="font-semibold px-4 py-2 bg-[#d3869b] text-[#282828] rounded hover:bg-[#fabd2f] focus:ring-[#fabd2f] disabled:bg-[#928374]">Refresh</button>
+        </div>
+      </div>
+      <div id="deployments"></div>
+      <div id="errors"></div>
+    </div>
+    <script src="assets/js/deps.js" defer></script>
+  </body>
+</html>
