@@ -1,0 +1,209 @@
+use super::super::utils::find_open_port_in_range;
+use crate::common::{DeploymentState, Environment};
+use crate::config::{ClusterConfig, ConfigSource};
+use crate::domain::{DeploymentDetails, DeploymentError};
+use crate::service::get_deployments;
+use aws_sdk_ecs::Client as ECSClient;
+use axum::Json;
+use axum::http::StatusCode;
+use axum::response::Response;
+use axum::response::{Html, IntoResponse};
+use axum::{Router, routing::get};
+use rand::Rng;
+use std::collections::HashMap;
+use std::io::Error as IOError;
+use std::sync::Arc;
+use tokio::signal;
+use tower_http::services::ServeDir;
+
+const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
+const ROOT_HTML: &str = include_str!("../../../assets/server/deps.html");
+
+#[derive(serde::Serialize)]
+struct GetDeploymentsResponse {
+    deployments: Vec<DeploymentDetails>,
+    errors: Vec<DeploymentError>,
+}
+
+#[derive(serde::Serialize)]
+struct ApiError {
+    error: String,
+}
+
+impl IntoResponse for GetDeploymentsResponse {
+    fn into_response(self) -> Response {
+        (StatusCode::OK, Json(self)).into_response()
+    }
+}
+
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        (StatusCode::INTERNAL_SERVER_ERROR, Json(self)).into_response()
+    }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum ServeDeploymentsError {
+    #[error("couldn't find open port")]
+    CouldntFindOpenPort,
+    #[error("incorrect port provided: {0}")]
+    IncorrectPortProvided(String),
+    #[error("couldn't bind to address: {0}")]
+    CouldntBindToAddress(IOError),
+    #[error("couldn't start server: {0}")]
+    CouldntStartServer(IOError),
+}
+
+pub async fn serve_deployments(
+    clusters: Vec<ClusterConfig>,
+    clients_map: Arc<HashMap<ConfigSource, ECSClient>>,
+    state: Option<DeploymentState>,
+    skip_opening: bool,
+    env: Environment,
+) -> Result<(), ServeDeploymentsError> {
+    let serve_dir = ServeDir::new("assets/server");
+    let router = Router::new()
+        .route("/", get(|| root_get(env)))
+        .route("/dev/api/deps", get(fake_deployments_get))
+        .route(
+            "/api/deps",
+            get({
+                let clients_map = Arc::clone(&clients_map);
+                move || deployments_get(clusters, clients_map, state)
+            }),
+        )
+        .nest_service("/assets", serve_dir);
+
+    let port = match std::env::var(ENV_VAR_PORT) {
+        Ok(port_str) => match port_str.parse::<u16>() {
+            Ok(p) => Ok(p),
+            Err(e) => Err(ServeDeploymentsError::IncorrectPortProvided(e.to_string())),
+        },
+        Err(e) => match e {
+            std::env::VarError::NotPresent => find_open_port_in_range(4500, 5000)
+                .ok_or(ServeDeploymentsError::CouldntFindOpenPort),
+            std::env::VarError::NotUnicode(s) => Err(ServeDeploymentsError::IncorrectPortProvided(
+                s.to_string_lossy().to_string(),
+            )),
+        },
+    }?;
+
+    let address = format!("127.0.0.1:{}", port);
+
+    let listener = tokio::net::TcpListener::bind(&address)
+        .await
+        .map_err(ServeDeploymentsError::CouldntBindToAddress)?;
+
+    let http_address = format!("http://{}", &address);
+
+    if !skip_opening {
+        if open::that(&http_address).is_err() {
+            eprintln!(
+                "couldn't open your browser, please open the following address manually:\n{}",
+                &http_address
+            )
+        } else {
+            println!("serving results on {}", &http_address);
+        }
+    } else {
+        println!("serving results on {}", &http_address);
+    }
+
+    axum::serve(listener, router)
+        .with_graceful_shutdown(shutdown_signal())
+        .await
+        .map_err(ServeDeploymentsError::CouldntStartServer)?;
+
+    Ok(())
+}
+
+async fn root_get(env: Environment) -> impl IntoResponse {
+    match env {
+        Environment::Dev => {
+            #[allow(clippy::unwrap_used)]
+            let html = tokio::fs::read_to_string("assets/server/deps.html")
+                .await
+                .unwrap();
+            Html(html)
+        }
+        Environment::Prod => Html(ROOT_HTML.to_string()),
+    }
+}
+
+async fn deployments_get(
+    clusters: Vec<ClusterConfig>,
+    clients_map: Arc<HashMap<ConfigSource, ECSClient>>,
+    state: Option<DeploymentState>,
+) -> Result<GetDeploymentsResponse, ApiError> {
+    let (deployments, errors) = get_deployments(clusters, clients_map, state)
+        .await
+        .map_err(|error| ApiError { error })?;
+
+    let response = GetDeploymentsResponse {
+        deployments,
+        errors,
+    };
+
+    Ok(response)
+}
+
+async fn fake_deployments_get() -> GetDeploymentsResponse {
+    tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
+
+    let mut rng = rand::rng();
+
+    let services = (1..10)
+        .map(|i| format!("service-{}", i))
+        .collect::<Vec<_>>();
+
+    let mut deployments = vec![];
+    let envs = ["qa", "staging", "prod"];
+
+    services.iter().for_each(|s| {
+        envs.iter().for_each(|env| {
+            let dep = if rng.random_bool(0.8) {
+                DeploymentDetails::dummy_running(s, env)
+            } else if rng.random_bool(0.6) {
+                DeploymentDetails::dummy_pending(s, env)
+            } else if rng.random_bool(0.6) {
+                DeploymentDetails::dummy_failing(s, env)
+            } else {
+                DeploymentDetails::dummy_draining(s, env)
+            };
+
+            deployments.push(dep);
+        });
+    });
+
+    GetDeploymentsResponse {
+        deployments,
+        errors: vec![],
+    }
+}
+
+#[allow(clippy::expect_used)]
+async fn shutdown_signal() {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install ctrl+c handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    println!("\nbye 👋");
+}
