@@ -40,7 +40,12 @@ pub enum EcscopeCommand {
         )]
         format: OutputFormat,
         /// Output mode
-        #[arg(short = 'm', long = "mode")]
+        #[arg(
+            short = 'm',
+            long = "mode",
+            value_name = "STRING",
+            default_value = "default"
+        )]
         mode: OutputMode,
         /// Whether to skip opening web results in browser (when --mode=web)
         #[arg(long = "web-skip-opening")]
