@@ -23,8 +23,8 @@ jobs:
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install elm
-        uses: ./.github/install-elm
+        uses: ./.github/actions/install-elm
       - name: Compile elm to js
-        uses: ./.github/compile-elm
+        uses: ./.github/actions/compile-elm
       - name: Build
         run: cargo build

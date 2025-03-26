@@ -22,9 +22,9 @@ jobs:
         with:
           components: clippy, rustfmt
       - name: Install elm
-        uses: ./.github/install-elm
+        uses: ./.github/actions/install-elm
       - name: Compile elm to js
-        uses: ./.github/compile-elm
+        uses: ./.github/actions/compile-elm
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Lint
