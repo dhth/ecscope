@@ -5,7 +5,7 @@ use crate::domain::{DeploymentDetails, DeploymentError};
 use crate::service::get_deployments;
 use aws_sdk_ecs::Client as ECSClient;
 use axum::Json;
-use axum::http::StatusCode;
+use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
 use axum::response::{Html, IntoResponse};
 use axum::{Router, routing::get};
@@ -17,7 +17,8 @@ use tokio::signal;
 use tower_http::services::ServeDir;
 
 const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
-const ROOT_HTML: &str = include_str!("../../../assets/server/deps.html");
+const ROOT_HTML: &str = include_str!("client/index.html");
+const DEPS_JS: &str = include_str!("client/assets/js/deps.js");
 
 #[derive(serde::Serialize)]
 struct GetDeploymentsResponse {
@@ -61,9 +62,10 @@ pub async fn serve_deployments(
     skip_opening: bool,
     env: Environment,
 ) -> Result<(), ServeDeploymentsError> {
-    let serve_dir = ServeDir::new("assets/server");
+    let serve_dir = ServeDir::new("src/server/deployments/client/assets");
     let router = Router::new()
-        .route("/", get(|| root_get(env)))
+        .route("/", get(move || root_get(env)))
+        .route("/assets/js/deps.js", get(move || js_get(env)))
         .route("/dev/api/deps", get(fake_deployments_get))
         .route(
             "/api/deps",
@@ -117,11 +119,28 @@ pub async fn serve_deployments(
     Ok(())
 }
 
+async fn js_get(env: Environment) -> impl IntoResponse {
+    let mut headers = HeaderMap::new();
+    #[allow(clippy::unwrap_used)]
+    headers.insert("Content-Type", "text/javascript".parse().unwrap());
+    let js = match env {
+        Environment::Dev =>
+        {
+            #[allow(clippy::unwrap_used)]
+            tokio::fs::read_to_string("src/server/deployments/client/deps.js")
+                .await
+                .unwrap()
+        }
+        Environment::Prod => DEPS_JS.to_string(),
+    };
+    (headers, js)
+}
+
 async fn root_get(env: Environment) -> impl IntoResponse {
     match env {
         Environment::Dev => {
             #[allow(clippy::unwrap_used)]
-            let html = tokio::fs::read_to_string("assets/server/deps.html")
+            let html = tokio::fs::read_to_string("src/server/deployments/client/index.html")
                 .await
                 .unwrap();
             Html(html)
@@ -147,12 +166,20 @@ async fn deployments_get(
     Ok(response)
 }
 
-async fn fake_deployments_get() -> GetDeploymentsResponse {
+async fn fake_deployments_get() -> Result<GetDeploymentsResponse, ApiError> {
     tokio::time::sleep(std::time::Duration::from_millis(1000)).await;
 
     let mut rng = rand::rng();
 
-    let services = (1..10)
+    if rng.random_bool(1.0 / 10.0) {
+        return Err(ApiError {
+            error: "Something went wrong".to_string(),
+        });
+    }
+
+    let num_services = rng.random_range(1..=5);
+
+    let services = (0..num_services)
         .map(|i| format!("service-{}", i))
         .collect::<Vec<_>>();
 
@@ -175,10 +202,20 @@ async fn fake_deployments_get() -> GetDeploymentsResponse {
         });
     });
 
-    GetDeploymentsResponse {
+    let num_errors = rng.random_range(1..=5);
+    let errors = (0..num_errors)
+        .map(|i| DeploymentError {
+            service_name: format!("service-{}", i),
+            error: "couldn't get access token\nLine 2".to_string(),
+            cluster_arn: format!("cluster-{}", i),
+            keys: "qa".to_string(),
+        })
+        .collect::<Vec<_>>();
+
+    Ok(GetDeploymentsResponse {
         deployments,
-        errors: vec![],
-    }
+        errors,
+    })
 }
 
 #[allow(clippy::expect_used)]

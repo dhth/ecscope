@@ -118,7 +118,7 @@ async fn deployments_for_cluster(
                     service_name: service.to_string(),
                     error: format!("{:?}", error),
                     cluster_arn: cluster.arn.clone(),
-                    keys: cluster.keys.clone(),
+                    keys: cluster.keys.join(","),
                 }));
             }
         }

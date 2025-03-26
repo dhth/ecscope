@@ -3,7 +3,7 @@ pub struct DeploymentError {
     pub service_name: String,
     pub error: String,
     pub cluster_arn: String,
-    pub keys: Vec<String>,
+    pub keys: String,
 }
 
 impl std::fmt::Display for DeploymentError {

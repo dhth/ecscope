@@ -16,7 +16,8 @@ categories = [
     "command-line-utilities",
 ]
 exclude = [
-    ".github"
+    ".github",
+    "client",
 ]
 
 [dependencies]

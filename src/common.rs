@@ -74,7 +74,7 @@ impl std::fmt::Display for OutputMode {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub enum Environment {
     Dev,
     Prod,
