@@ -26,11 +26,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install elm
-        uses: jaxxstorm/action-install-gh-release@4304621e8c48d66093a8a214af5d5b5bc3b3d943
+      - uses: jorelali/setup-elm@v6
         with:
-          repo: elm/compiler
-          tag: 0.19.1
+          elm-version: 0.19.1
       - name: Compile elm to js
         run: |
           cd client/deps
