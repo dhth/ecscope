@@ -1,7 +1,8 @@
 module Cmds exposing (fetchDeps)
 
 import Http
-import Types exposing (Msg(..), deploymentResultsDecoder)
+import Serde exposing (deploymentResultsDecoder)
+import Types exposing (Msg(..))
 
 
 fetchDeps : Cmd Msg

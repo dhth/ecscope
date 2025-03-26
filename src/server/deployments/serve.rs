@@ -127,7 +127,7 @@ async fn js_get(env: Environment) -> impl IntoResponse {
         Environment::Dev =>
         {
             #[allow(clippy::unwrap_used)]
-            tokio::fs::read_to_string("src/server/deployments/client/deps.js")
+            tokio::fs::read_to_string("src/server/deployments/client/assets/js/deps.js")
                 .await
                 .unwrap()
         }
@@ -188,14 +188,16 @@ async fn fake_deployments_get() -> Result<GetDeploymentsResponse, ApiError> {
 
     services.iter().for_each(|s| {
         envs.iter().for_each(|env| {
-            let dep = if rng.random_bool(0.8) {
+            let dep = if rng.random_bool(0.6) {
                 DeploymentDetails::dummy_running(s, env)
-            } else if rng.random_bool(0.6) {
-                DeploymentDetails::dummy_pending(s, env)
-            } else if rng.random_bool(0.6) {
-                DeploymentDetails::dummy_failing(s, env)
             } else {
-                DeploymentDetails::dummy_draining(s, env)
+                let choices = [
+                    DeploymentDetails::dummy_pending(s, env),
+                    DeploymentDetails::dummy_active(s, env),
+                    DeploymentDetails::dummy_failing(s, env),
+                    DeploymentDetails::dummy_draining(s, env),
+                ];
+                choices[rng.random_range(0..choices.len())].clone()
             };
 
             deployments.push(dep);

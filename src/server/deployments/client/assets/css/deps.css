@@ -3,8 +3,8 @@
 	--fg: #ebdbb2;
 	--accent: #fabd2f;
 	--failing: #fb4934;
-	--active: #b8bb26;
-	--pending: #fabd2f;
+	--active: #fabd2f;
+	--pending: #b8bb2f;
 	--border: #282828;
 	--heading: #b8bb26;
     --draining: #928374;
@@ -101,4 +101,30 @@ tr:last-child td {
 
 .error-message {
     color: #fe8019
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    border: 2px solid #504945;
+}
+
+.legend-pending {
+    background-color: var(--pending);
+    color: var(--bg);
+}
+
+.legend-active {
+    background-color: var(--active);
+    color: var(--bg);
+}
+
+.legend-draining {
+    background-color: var(--draining);
+    color: var(--bg);
+}
+
+.legend-failing {
+    background-color: var(--failing);
+    color: var(--bg);
 }

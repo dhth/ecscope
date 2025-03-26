@@ -59,10 +59,24 @@ impl DeploymentDetails {
             keys: keys.to_string(),
             cluster_arn: "".to_string(),
             deployment_id: "".to_string(),
-            status: "ACTIVE".to_string(),
+            status: "PRIMARY".to_string(),
             running_count: 0,
             desired_count: 2,
             pending_count: 2,
+            failed_count: 0,
+        }
+    }
+
+    pub fn dummy_active(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "ACTIVE".to_string(),
+            running_count: 2,
+            desired_count: 0,
+            pending_count: 0,
             failed_count: 0,
         }
     }

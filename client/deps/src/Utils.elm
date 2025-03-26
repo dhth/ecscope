@@ -1,185 +1,17 @@
 module Utils exposing (..)
 
-import Html exposing (div, h2, hr, input, p, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, id)
 import Http
 import Json.Encode exposing (Value, bool, object)
-import Types exposing (Deployment, DeploymentError, Model)
+import Types exposing (Model)
 
 
 modelToJson : Model -> Value
 modelToJson model =
     object
-        [ ( "reload_seconds", Json.Encode.string (Debug.toString model.reload_seconds) )
+        [ ( "reload_seconds", Json.Encode.string (String.fromInt model.reload_seconds) )
         , ( "auto_refresh", bool model.auto_refresh )
         , ( "fetching", bool model.fetching )
         ]
-
-
-getHeading : Bool -> String
-getHeading fetching =
-    if fetching then
-        "ecscope ..."
-
-    else
-        "ecscope"
-
-
-getRowClass : Deployment -> String
-getRowClass deployment =
-    if deployment.failed_count > 0 then
-        "row-failing"
-
-    else if deployment.status == "ACTIVE" then
-        "row-active"
-
-    else if not (deployment.running_count == deployment.desired_count) then
-        "row-pending"
-
-    else if deployment.status == "DRAINING" then
-        "row-draining"
-
-    else
-        ""
-
-
-getColorForString : String -> List String -> String
-getColorForString input colors =
-    let
-        hash =
-            String.foldl (\char acc -> acc + Char.toCode char) 0 input
-
-        index =
-            Basics.remainderBy (List.length colors) hash
-    in
-    case List.drop index colorPool |> List.head of
-        Just color ->
-            color
-
-        Nothing ->
-            "#000000"
-
-
-getServiceNameTableData : Deployment -> Html.Html msg
-getServiceNameTableData deployment =
-    if
-        deployment.failed_count
-            > 0
-            || deployment.status
-            == "ACTIVE"
-            || not
-                (deployment.running_count
-                    == deployment.desired_count
-                )
-            || deployment.status
-            == "DRAINING"
-    then
-        td [ class "font-semibold" ] [ text deployment.service_name ]
-
-    else
-        td [ class ("font-semibold text-[" ++ getColorForString deployment.service_name colorPool ++ "]") ] [ text deployment.service_name ]
-
-
-renderDeploymentRow : Deployment -> Html.Html msg
-renderDeploymentRow deployment =
-    let
-        rowClass =
-            getRowClass deployment
-    in
-    tr [ class rowClass ]
-        [ getServiceNameTableData deployment
-        , td [] [ text deployment.keys ]
-        , td [] [ text deployment.status ]
-        , td [] [ text (String.fromInt deployment.running_count) ]
-        , td [] [ text (String.fromInt deployment.desired_count) ]
-        , td [] [ text (String.fromInt deployment.pending_count) ]
-        , td [] [ text (String.fromInt deployment.failed_count) ]
-        ]
-
-
-getDeploymentsTable : List Deployment -> Html.Html msg
-getDeploymentsTable deployments =
-    table [ class "table-auto w-full px-4 py-2", id "deployments-table" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Service" ]
-                , th [] [ text "Keys" ]
-                , th [] [ text "Status" ]
-                , th [] [ text "Running" ]
-                , th [] [ text "Desired" ]
-                , th [] [ text "Pending" ]
-                , th [] [ text "Failed" ]
-                ]
-            ]
-        , tbody []
-            (List.map renderDeploymentRow deployments)
-        ]
-
-
-getErrorServiceNameTableData : DeploymentError -> Html.Html msg
-getErrorServiceNameTableData error =
-    td [ class ("font-semibold text-[" ++ getColorForString error.service_name colorPool ++ "]") ] [ text error.service_name ]
-
-
-renderErrorWithNewlines : String -> List (Html.Html msg)
-renderErrorWithNewlines errorText =
-    String.split "\n" errorText
-        |> List.map (\line -> div [] [ text line ])
-
-
-renderErrorRow : DeploymentError -> Html.Html msg
-renderErrorRow error =
-    tr []
-        [ getErrorServiceNameTableData error
-        , td [] [ text error.keys ]
-        , td [] (renderErrorWithNewlines error.error)
-        ]
-
-
-getErrorsTable : List DeploymentError -> Html.Html msg
-getErrorsTable errors =
-    table [ class "table-auto w-full px-4 py-2", id "errors-table" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Service" ]
-                , th [] [ text "Keys" ]
-                , th [] [ text "Error" ]
-                ]
-            ]
-        , tbody []
-            (List.map renderErrorRow errors)
-        ]
-
-
-getResultsDiv : List Deployment -> List DeploymentError -> Html.Html msg
-getResultsDiv deployments errors =
-    div []
-        (List.concat
-            [ if not (List.isEmpty deployments) then
-                [ div []
-                    [ h2 [ class "text-xl font-bold mb-6 text-[#83a598]" ] [ text "Deployments" ]
-                    , getDeploymentsTable deployments
-                    ]
-                , if not (List.isEmpty errors) then
-                    hr [ class "h-px my-10 bg-[#928374] border-0 dark:bg-[#928374]" ] []
-
-                  else
-                    Html.text ""
-                ]
-
-              else
-                []
-            , if not (List.isEmpty errors) then
-                [ div []
-                    [ h2 [ class "text-xl font-bold mb-6 text-[#fb4934]" ] [ text "Errors" ]
-                    , getErrorsTable errors
-                    ]
-                ]
-
-              else
-                []
-            ]
-        )
 
 
 httpErrorToString : Http.Error -> String
@@ -201,18 +33,21 @@ httpErrorToString error =
             "Bad body: " ++ body
 
 
-getHttpErrorDiv : Http.Error -> Html.Html msg
-getHttpErrorDiv error =
-    div [ class "error-message" ]
-        [ p [] [ text ("Error: " ++ httpErrorToString error) ]
-        ]
+getColorForString : String -> List String -> String
+getColorForString input colors =
+    let
+        hash =
+            String.foldl (\char acc -> acc + Char.toCode char) 0 input
 
+        index =
+            Basics.remainderBy (List.length colors) hash
+    in
+    case List.drop index colorPool |> List.head of
+        Just color ->
+            color
 
-getLoadingMessage : Html.Html msg
-getLoadingMessage =
-    div [ id "deployments" ] <|
-        [ p [] [ text "loading..." ]
-        ]
+        Nothing ->
+            "#000000"
 
 
 colorPool : List String

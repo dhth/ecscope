@@ -1,8 +1,6 @@
 module Types exposing (..)
 
 import Http
-import Json.Decode exposing (Decoder)
-import Json.Decode.Pipeline
 
 
 type alias Deployment =
@@ -54,30 +52,3 @@ type Msg
     | AutoRefreshScheduleChanged RefreshScheduleNumSeconds
     | ResultsFetched (Result Http.Error DeploymentResults)
     | Tick
-
-
-deploymentDecoder : Decoder Deployment
-deploymentDecoder =
-    Json.Decode.succeed Deployment
-        |> Json.Decode.Pipeline.required "service_name" Json.Decode.string
-        |> Json.Decode.Pipeline.required "keys" Json.Decode.string
-        |> Json.Decode.Pipeline.required "status" Json.Decode.string
-        |> Json.Decode.Pipeline.required "running_count" Json.Decode.int
-        |> Json.Decode.Pipeline.required "desired_count" Json.Decode.int
-        |> Json.Decode.Pipeline.required "pending_count" Json.Decode.int
-        |> Json.Decode.Pipeline.required "failed_count" Json.Decode.int
-
-
-errorDecoder : Decoder DeploymentError
-errorDecoder =
-    Json.Decode.succeed DeploymentError
-        |> Json.Decode.Pipeline.required "service_name" Json.Decode.string
-        |> Json.Decode.Pipeline.required "keys" Json.Decode.string
-        |> Json.Decode.Pipeline.required "error" Json.Decode.string
-
-
-deploymentResultsDecoder : Decoder DeploymentResults
-deploymentResultsDecoder =
-    Json.Decode.map2 DeploymentResults
-        (Json.Decode.field "deployments" (Json.Decode.list deploymentDecoder))
-        (Json.Decode.field "errors" (Json.Decode.list errorDecoder))

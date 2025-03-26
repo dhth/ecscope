@@ -13,7 +13,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
+  lint-rust:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,8 +31,21 @@ jobs:
       - name: Compile elm to js
         run: |
           cd client/deps
-          elm make src/Deps.elm --output ../../src/server/deployments/client/assets/js/deps.js
+          elm make src/Deps.elm --optimize --output ../../src/server/deployments/client/assets/js/deps.js
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Lint
         run: cargo clippy
+
+  lint-elm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elm-format
+        uses: taiki-e/install-action@v2
+        with:
+          tool: elm-format
+      - name: Check formatting
+        run: |
+          cd client/deps
+          elm-format --validate src
