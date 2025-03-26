@@ -15,13 +15,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-      - name: Install elm
-        uses: ./.github/actions/install-elm
       - name: Build main
         run: cargo build --target-dir /var/tmp/main
       - name: Add profile with ecscope on main
         run: /var/tmp/main/debug/ecscope profiles add prof1
       - uses: actions/checkout@v4
+      - name: Install elm
+        uses: ./.github/actions/install-elm
       - name: Compile elm to js
         uses: ./.github/actions/compile-elm
       - name: Build head
