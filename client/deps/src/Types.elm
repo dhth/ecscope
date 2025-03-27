@@ -37,15 +37,6 @@ type alias RefreshScheduleNumSeconds =
     Maybe Int
 
 
-type alias Model =
-    { status : Status
-    , reload_seconds : Int
-    , auto_refresh : Bool
-    , fetching : Bool
-    , debug : Bool
-    }
-
-
 type Msg
     = FetchResults
     | AutoRefreshToggled Bool

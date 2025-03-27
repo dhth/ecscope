@@ -208,7 +208,7 @@ async fn fake_deployments_get() -> Result<GetDeploymentsResponse, ApiError> {
     let errors = (0..num_errors)
         .map(|i| DeploymentError {
             service_name: format!("service-{}", i),
-            error: "couldn't get access token\nLine 2".to_string(),
+            error: "couldn't get access token\nLine 2\nLine 3\nLine 4".to_string(),
             cluster_arn: format!("cluster-{}", i),
             keys: "qa".to_string(),
         })

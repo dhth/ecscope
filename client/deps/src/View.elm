@@ -1,11 +1,12 @@
 module View exposing (view)
 
-import Html exposing (button, div, h1, h2, hr, input, label, p, pre, span, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (checked, class, id)
+import Html exposing (a, button, div, h1, h2, hr, input, label, p, pre, span, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (checked, class, href, id, target)
 import Html.Events
 import Http
 import Json.Encode
-import Types exposing (Deployment, DeploymentError, Model, Msg(..), Status(..))
+import Model exposing (Model)
+import Types exposing (Deployment, DeploymentError, Msg(..), Status(..))
 import Utils exposing (..)
 
 
@@ -46,7 +47,7 @@ heading fetching =
                 "ecscope"
     in
     h1 [ class "text-3xl font-bold mb-6" ]
-        [ text headingText
+        [ a [ href "https://github.com/dhth/ecscope", target "_blank" ] [ text headingText ]
         ]
 
 
@@ -54,9 +55,9 @@ fetchControlsDiv : Model -> Html.Html Msg
 fetchControlsDiv model =
     div [ class "mb-4 flex items-center space-x-4" ]
         [ div [ class "flex items-center space-x-2 py-2 rounded bg-[#282828]" ]
-            [ label [ class "flex items-center space-x-2", Html.Attributes.for "refresh-toggle" ]
+            [ label [ class "flex items-center space-x-2", Html.Attributes.for "auto-refresh-toggle" ]
                 [ input
-                    [ id "refresh-toggle"
+                    [ id "auto-refresh-toggle"
                     , Html.Attributes.type_ "checkbox"
                     , class "w-4 h-4 text-[#fabd2f] bg-[#282828] rounded focus:ring-[#fabd2f]"
                     , Html.Events.onCheck AutoRefreshToggled
@@ -67,7 +68,7 @@ fetchControlsDiv model =
                 , span [] [ text "Auto refresh every" ]
                 ]
             , input
-                [ id "refresh-interval"
+                [ id "auto-refresh-interval"
                 , Html.Attributes.type_ "number"
                 , class "w-12 h-8 text-center text-[#ebdbb2] bg-[#3c3836] rounded focus:ring-[#fabd2f]"
                 , Html.Attributes.min "5"
@@ -113,8 +114,130 @@ httpErrorDiv error =
 
 loadingMessage : Html.Html msg
 loadingMessage =
-    div [ id "deployments" ] <|
-        [ p [] [ text "loading..." ]
+    div [] <|
+        [ h2 [ class "text-xl font-bold mb-6 text-[#fabd2f]", id "loading-message" ] [ text "Loading..." ]
+        ]
+
+
+resultsDiv : List Deployment -> List DeploymentError -> Html.Html msg
+resultsDiv deployments errors =
+    let
+        depsPresent =
+            not (List.isEmpty deployments)
+
+        errorsPresent =
+            not (List.isEmpty errors)
+    in
+    if not depsPresent && not errorsPresent then
+        noDeploymentResultsDiv
+
+    else
+        div [ id "deployment-results" ]
+            (List.concat
+                [ if depsPresent then
+                    [ deploymentDetailsDiv deployments
+                    ]
+
+                  else
+                    []
+                , if depsPresent && errorsPresent then
+                    [ deploymentResultsDivider ]
+
+                  else
+                    []
+                , if errorsPresent then
+                    [ deploymentErrorsDiv errors
+                    ]
+
+                  else
+                    []
+                ]
+            )
+
+
+noDeploymentResultsDiv : Html.Html msg
+noDeploymentResultsDiv =
+    div [ id "no-deployment-results" ]
+        [ h2 [ class "text-xl font-bold mb-6 text-[#83a598]" ] [ text "No Deployments found" ]
+        ]
+
+
+deploymentDetailsDiv : List Deployment -> Html.Html msg
+deploymentDetailsDiv deployments =
+    div [ id "deployment-details" ]
+        [ h2 [ class "text-xl font-bold mb-6 text-[#83a598]" ] [ text "Deployments" ]
+        , div [ class "legend mb-4 p-4" ]
+            [ p [ class "p-1 m-1 font-semibold" ] [ text "Legend: " ]
+            , p [ class "legend-pending py-1 px-2 m-1 font-semibold" ] [ text "pending" ]
+            , p [ class "legend-active py-1 px-2 m-1 font-semibold" ] [ text "being replaced" ]
+            , p [ class "legend-draining py-1 px-2 m-1 font-semibold" ] [ text "draining" ]
+            , p [ class "legend-failing py-1 px-2 m-1 font-semibold" ] [ text "failing" ]
+            ]
+        , deploymentsTable deployments
+        ]
+
+
+deploymentResultsDivider : Html.Html msg
+deploymentResultsDivider =
+    hr [ class "h-px my-10 bg-[#928374] border-0 dark:bg-[#928374]", id "results-divider" ] []
+
+
+deploymentErrorsDiv : List DeploymentError -> Html.Html msg
+deploymentErrorsDiv errors =
+    div [ id "deployment-errors" ]
+        [ h2 [ class "text-xl font-bold mb-6 text-[#fb4934]" ] [ text "Errors" ]
+        , errorsTable errors
+        ]
+
+
+deploymentsTable : List Deployment -> Html.Html msg
+deploymentsTable deployments =
+    table [ class "table-auto w-full px-4 py-2", id "deployment-details-table" ]
+        [ thead []
+            [ tr []
+                [ th [] [ text "Service" ]
+                , th [] [ text "Keys" ]
+                , th [] [ text "Status" ]
+                , th [] [ text "Running" ]
+                , th [] [ text "Desired" ]
+                , th [] [ text "Pending" ]
+                , th [] [ text "Failed" ]
+                ]
+            ]
+        , tbody []
+            (List.map deploymentTableRow deployments)
+        ]
+
+
+errorsTable : List DeploymentError -> Html.Html msg
+errorsTable errors =
+    table [ class "table-auto w-full px-4 py-2", id "deployment-errors-table" ]
+        [ thead []
+            [ tr []
+                [ th [] [ text "Service" ]
+                , th [] [ text "Keys" ]
+                , th [] [ text "Error" ]
+                ]
+            ]
+        , tbody []
+            (List.map renderErrorRow errors)
+        ]
+
+
+deploymentTableRow : Deployment -> Html.Html msg
+deploymentTableRow deployment =
+    let
+        rowClass =
+            tableRowClass deployment
+    in
+    tr [ class rowClass ]
+        [ serviceNameTableData deployment
+        , td [] [ text deployment.keys ]
+        , td [] [ text deployment.status ]
+        , td [] [ text (String.fromInt deployment.running_count) ]
+        , td [] [ text (String.fromInt deployment.desired_count) ]
+        , td [] [ text (String.fromInt deployment.pending_count) ]
+        , td [] [ text (String.fromInt deployment.failed_count) ]
         ]
 
 
@@ -156,39 +279,12 @@ serviceNameTableData deployment =
         td [ class ("font-semibold text-[" ++ getColorForString deployment.service_name colorPool ++ "]") ] [ text deployment.service_name ]
 
 
-deploymentTableRow : Deployment -> Html.Html msg
-deploymentTableRow deployment =
-    let
-        rowClass =
-            tableRowClass deployment
-    in
-    tr [ class rowClass ]
-        [ serviceNameTableData deployment
-        , td [] [ text deployment.keys ]
-        , td [] [ text deployment.status ]
-        , td [] [ text (String.fromInt deployment.running_count) ]
-        , td [] [ text (String.fromInt deployment.desired_count) ]
-        , td [] [ text (String.fromInt deployment.pending_count) ]
-        , td [] [ text (String.fromInt deployment.failed_count) ]
-        ]
-
-
-deploymentsTable : List Deployment -> Html.Html msg
-deploymentsTable deployments =
-    table [ class "table-auto w-full px-4 py-2", id "deployments-table" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Service" ]
-                , th [] [ text "Keys" ]
-                , th [] [ text "Status" ]
-                , th [] [ text "Running" ]
-                , th [] [ text "Desired" ]
-                , th [] [ text "Pending" ]
-                , th [] [ text "Failed" ]
-                ]
-            ]
-        , tbody []
-            (List.map deploymentTableRow deployments)
+renderErrorRow : DeploymentError -> Html.Html msg
+renderErrorRow error =
+    tr []
+        [ errorTableServiceNameTableData error
+        , td [] [ text error.keys ]
+        , td [] (errorWithNewlines error.error)
         ]
 
 
@@ -201,65 +297,3 @@ errorWithNewlines : String -> List (Html.Html msg)
 errorWithNewlines errorText =
     String.split "\n" errorText
         |> List.map (\line -> div [] [ text line ])
-
-
-renderErrorRow : DeploymentError -> Html.Html msg
-renderErrorRow error =
-    tr []
-        [ errorTableServiceNameTableData error
-        , td [] [ text error.keys ]
-        , td [] (errorWithNewlines error.error)
-        ]
-
-
-getErrorsTable : List DeploymentError -> Html.Html msg
-getErrorsTable errors =
-    table [ class "table-auto w-full px-4 py-2", id "errors-table" ]
-        [ thead []
-            [ tr []
-                [ th [] [ text "Service" ]
-                , th [] [ text "Keys" ]
-                , th [] [ text "Error" ]
-                ]
-            ]
-        , tbody []
-            (List.map renderErrorRow errors)
-        ]
-
-
-resultsDiv : List Deployment -> List DeploymentError -> Html.Html msg
-resultsDiv deployments errors =
-    div []
-        (List.concat
-            [ if not (List.isEmpty deployments) then
-                [ div []
-                    [ h2 [ class "text-xl font-bold mb-6 text-[#83a598]" ] [ text "Deployments" ]
-                    , div [ class "legend mb-4 p-4" ]
-                        [ p [ class "p-1 m-1 font-semibold" ] [ text "Legend: " ]
-                        , p [ class "legend-pending py-1 px-2 m-1 font-semibold" ] [ text "pending" ]
-                        , p [ class "legend-active py-1 px-2 m-1 font-semibold" ] [ text "being replaced" ]
-                        , p [ class "legend-draining py-1 px-2 m-1 font-semibold" ] [ text "draining" ]
-                        , p [ class "legend-failing py-1 px-2 m-1 font-semibold" ] [ text "failing" ]
-                        ]
-                    , deploymentsTable deployments
-                    ]
-                , if not (List.isEmpty errors) then
-                    hr [ class "h-px my-10 bg-[#928374] border-0 dark:bg-[#928374]" ] []
-
-                  else
-                    Html.text ""
-                ]
-
-              else
-                []
-            , if not (List.isEmpty errors) then
-                [ div []
-                    [ h2 [ class "text-xl font-bold mb-6 text-[#fb4934]" ] [ text "Errors" ]
-                    , getErrorsTable errors
-                    ]
-                ]
-
-              else
-                []
-            ]
-        )

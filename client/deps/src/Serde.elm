@@ -17,8 +17,8 @@ deploymentDecoder =
         |> required "failed_count" int
 
 
-errorDecoder : Decoder DeploymentError
-errorDecoder =
+deploymentErrorDecoder : Decoder DeploymentError
+deploymentErrorDecoder =
     succeed DeploymentError
         |> required "service_name" string
         |> required "keys" string
@@ -29,4 +29,4 @@ deploymentResultsDecoder : Decoder DeploymentResults
 deploymentResultsDecoder =
     map2 DeploymentResults
         (field "deployments" (list deploymentDecoder))
-        (field "errors" (list errorDecoder))
+        (field "errors" (list deploymentErrorDecoder))

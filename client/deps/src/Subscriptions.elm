@@ -1,9 +1,10 @@
 module Subscriptions exposing (scheduleNextTick, subs)
 
+import Model exposing (Model)
 import Process
 import Task
 import Time
-import Types exposing (Model, Msg(..))
+import Types exposing (Msg(..))
 
 
 subs : Model -> Sub Msg

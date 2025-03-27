@@ -70,17 +70,17 @@ th {
 	border-bottom: none;
 }
 
-#deployments-table th:first-child {
+#deployments-details-table th:first-child {
 	width: 30%;
 }
-#deployments-table th:nth-child(2) {
+#deployments-details-table th:nth-child(2) {
 	width: 20%;
 }
-#deployments-table th:nth-child(3),
-#deployments-table th:nth-child(4),
-#deployments-table th:nth-child(5),
-#deployments-table th:nth-child(6),
-#deployments-table th:nth-child(7) {
+#deployments-details-table th:nth-child(3),
+#deployments-details-table th:nth-child(4),
+#deployments-details-table th:nth-child(5),
+#deployments-details-table th:nth-child(6),
+#deployments-details-table th:nth-child(7) {
 	width: 10%;
 }
 
@@ -92,10 +92,10 @@ tr:last-child td {
 	border-bottom: none;
 }
 
-#errors-table th:first-child {
+#deployments-errors th:first-child {
 	width: 30%;
 }
-#errors-table th:nth-child(2) {
+#deployments-errors th:nth-child(2) {
 	width: 20%;
 }
 

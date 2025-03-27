@@ -2,7 +2,7 @@ module Utils exposing (..)
 
 import Http
 import Json.Encode exposing (Value, bool, object)
-import Types exposing (Model)
+import Model exposing (Model)
 
 
 modelToJson : Model -> Value

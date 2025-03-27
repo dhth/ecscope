@@ -1,8 +1,9 @@
 module Update exposing (update)
 
 import Cmds exposing (fetchDeps)
+import Model exposing (Model)
 import Subscriptions exposing (scheduleNextTick)
-import Types exposing (Model, Msg(..), Status(..))
+import Types exposing (Msg(..), Status(..))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
