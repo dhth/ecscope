@@ -7,6 +7,8 @@ mod debug;
 mod domain;
 mod errors;
 mod handle;
+mod server;
+mod service;
 mod tui;
 mod utils;
 

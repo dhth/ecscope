@@ -22,5 +22,23 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install elm
+        uses: ./.github/actions/install-elm
+      - name: Compile elm to js
+        uses: ./.github/actions/compile-elm
       - name: Run tests
         run: cargo test
+
+  test-client:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elm
+        uses: ./.github/actions/install-elm
+      - name: Install elm-test
+        run: |
+          npm install elm-test -g
+      - name: Test
+        run: |
+          cd client/deps
+          elm-test

@@ -1,7 +1,9 @@
 use crate::args::{Args, EcscopeCommand, ProfilesCommand};
 use crate::cmds::{add_profile, list_deployments, list_profiles, run_monitor};
+use crate::common::{OutputMode, get_env};
 use crate::debug::display_debug_info;
 use crate::errors::AppError;
+use crate::server::serve_deployments;
 use crate::utils::{get_clusters, get_config_dir};
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -24,6 +26,8 @@ pub async fn handle(args: Args) -> Result<(), AppError> {
             key_filter,
             state,
             format,
+            mode,
+            web_skip_opening,
         } => {
             if let Some((clients_map, clusters)) = get_clusters(
                 &config_dir,
@@ -33,7 +37,23 @@ pub async fn handle(args: Args) -> Result<(), AppError> {
             )
             .await?
             {
-                list_deployments(clusters, Arc::new(clients_map), state, format).await?;
+                match mode {
+                    OutputMode::Default => {
+                        list_deployments(clusters, Arc::new(clients_map), state, format).await?
+                    }
+                    OutputMode::Web => {
+                        let env = get_env();
+                        serve_deployments(
+                            clusters,
+                            Arc::new(clients_map),
+                            state,
+                            web_skip_opening,
+                            env,
+                        )
+                        .await
+                        .map_err(AppError::ServeDeployments)?
+                    }
+                }
             }
         }
         EcscopeCommand::Profiles { profiles_command } => match profiles_command {
@@ -53,7 +73,9 @@ pub async fn handle(args: Args) -> Result<(), AppError> {
             )
             .await?
             {
-                run_monitor(profile_name.clone(), clients_map, clusters).await?;
+                run_monitor(profile_name.clone(), clients_map, clusters)
+                    .await
+                    .map_err(AppError::RunMonitor)?;
             }
         }
     }

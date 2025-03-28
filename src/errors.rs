@@ -1,4 +1,5 @@
 use crate::cmds::{AddProfileError, ListDeploymentsError, ListProfilesError};
+use crate::server::ServeDeploymentsError;
 use crate::utils::{ConfigDirError, GetClustersError};
 
 #[derive(thiserror::Error, Debug)]
@@ -12,9 +13,11 @@ pub enum AppError {
     #[error(transparent)]
     ListProfiles(#[from] ListProfilesError),
     #[error(transparent)]
-    RunMonitor(#[from] anyhow::Error),
+    RunMonitor(anyhow::Error),
     #[error(transparent)]
     ListDeployments(#[from] ListDeploymentsError),
+    #[error(transparent)]
+    ServeDeployments(#[from] ServeDeploymentsError),
 }
 
 impl AppError {
@@ -47,6 +50,12 @@ impl AppError {
                 ListDeploymentsError::SerializeToCSV(_) => Some(601),
                 ListDeploymentsError::FlushResultsToCSVWriter(_) => Some(602),
                 ListDeploymentsError::Unexpected(_) => Some(603),
+            },
+            AppError::ServeDeployments(e) => match e {
+                ServeDeploymentsError::CouldntFindOpenPort => None,
+                ServeDeploymentsError::IncorrectPortProvided(_) => None,
+                ServeDeploymentsError::CouldntBindToAddress(_) => None,
+                ServeDeploymentsError::CouldntStartServer(_) => Some(700),
             },
         }
     }

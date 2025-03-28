@@ -1,0 +1,13 @@
+name: install-elm
+description: 'Install elm'
+
+runs:
+  using: composite
+  steps:
+    - name: Install node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22'
+    - uses: jorelali/setup-elm@v6
+      with:
+        elm-version: 0.19.1
