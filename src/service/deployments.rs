@@ -83,7 +83,7 @@ async fn deployments_for_cluster(
                             dep.status().unwrap_or_default() == DEPLOYMENT_STATUS_PRIMARY
                                 && dep.running_count == dep.desired_count
                         }
-                        Some(DeploymentState::Pending) => {
+                        Some(DeploymentState::InProgress) => {
                             dep.status().unwrap_or_default() != DEPLOYMENT_STATUS_PRIMARY
                                 || dep.running_count != dep.desired_count
                         }

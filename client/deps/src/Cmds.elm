@@ -8,6 +8,6 @@ import Types exposing (Msg(..))
 fetchDeps : Cmd Msg
 fetchDeps =
     Http.get
-        { url = "/dev/api/deps"
+        { url = "/api/deps"
         , expect = Http.expectJson ResultsFetched deploymentResultsDecoder
         }

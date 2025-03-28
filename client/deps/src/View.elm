@@ -102,7 +102,7 @@ mainDiv model =
             httpErrorDiv error
 
         Loading ->
-            loadingMessage
+            loadingDiv
 
 
 httpErrorDiv : Http.Error -> Html.Html msg
@@ -112,8 +112,8 @@ httpErrorDiv error =
         ]
 
 
-loadingMessage : Html.Html msg
-loadingMessage =
+loadingDiv : Html.Html msg
+loadingDiv =
     div [] <|
         [ h2 [ class "text-xl font-bold mb-6 text-[#fabd2f]", id "loading-message" ] [ text "Loading..." ]
         ]
@@ -168,7 +168,7 @@ deploymentDetailsDiv deployments =
         [ h2 [ class "text-xl font-bold mb-6 text-[#83a598]" ] [ text "Deployments" ]
         , div [ class "legend mb-4 p-4" ]
             [ p [ class "p-1 m-1 font-semibold" ] [ text "Legend: " ]
-            , p [ class "legend-pending py-1 px-2 m-1 font-semibold" ] [ text "pending" ]
+            , p [ class "legend-upcoming py-1 px-2 m-1 font-semibold" ] [ text "upcoming" ]
             , p [ class "legend-active py-1 px-2 m-1 font-semibold" ] [ text "being replaced" ]
             , p [ class "legend-draining py-1 px-2 m-1 font-semibold" ] [ text "draining" ]
             , p [ class "legend-failing py-1 px-2 m-1 font-semibold" ] [ text "failing" ]
@@ -247,10 +247,10 @@ tableRowClass deployment =
         "row-failing"
 
     else if deployment.status == "ACTIVE" then
-        "row-active"
+        "row-being-replaced"
 
     else if not (deployment.running_count == deployment.desired_count) then
-        "row-pending"
+        "row-upcoming"
 
     else if deployment.status == "DRAINING" then
         "row-draining"

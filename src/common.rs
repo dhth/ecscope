@@ -29,9 +29,9 @@ impl std::fmt::Display for OutputFormat {
 pub enum DeploymentState {
     /// Deployment has no pending tasks
     Finished,
-    /// Deployment is pending
-    Pending,
-    /// Deployment is pending and has failed tasks
+    /// Deployment is in progress
+    InProgress,
+    /// Deployment is in progress and has failed tasks
     Failing,
 }
 
@@ -39,7 +39,7 @@ impl AsRef<str> for DeploymentState {
     fn as_ref(&self) -> &str {
         match self {
             DeploymentState::Finished => "finished",
-            DeploymentState::Pending => "pending",
+            DeploymentState::InProgress => "in-progress",
             DeploymentState::Failing => "failing",
         }
     }

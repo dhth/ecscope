@@ -35,13 +35,13 @@ h1 {
 	transition: background-color var(--transition-duration), color
 		var(--transition-duration);
 }
-.row-active {
+.row-being-replaced {
 	background-color: var(--active);
 	color: var(--bg);
 	transition: background-color var(--transition-duration), color
 		var(--transition-duration);
 }
-.row-pending {
+.row-upcoming {
 	background-color: var(--pending);
 	color: var(--bg);
 	transition: background-color var(--transition-duration), color
@@ -109,7 +109,7 @@ tr:last-child td {
     border: 2px solid #504945;
 }
 
-.legend-pending {
+.legend-upcoming {
     background-color: var(--pending);
     color: var(--bg);
 }

@@ -29,7 +29,7 @@ pub enum EcscopeCommand {
         #[arg(short = 'k', long = "key-filter", value_name = "REGEX", value_parser=validate_filter_query)]
         key_filter: Option<Regex>,
         /// Deployment state to query for
-        #[arg(long = "state", value_name = "STRING")]
+        #[arg(short = 'S', long = "state", value_name = "STRING")]
         state: Option<DeploymentState>,
         /// Format to use
         #[arg(
