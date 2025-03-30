@@ -20,10 +20,12 @@ pub fn update(model: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
       }
     types.AutoRefreshToggled(checked) ->
       case checked {
-        // TODO
-        c if c && model.fetching -> #(
+        c if c && !model.fetching -> #(
           Model(..model, fetching: True, auto_refresh: True),
-          effect.none(),
+          effect.batch([
+            effects.fetch_deps(),
+            effects.schedule_next_tick(model.reload_seconds),
+          ]),
         )
         _ -> #(Model(..model, auto_refresh: checked), effect.none())
       }
@@ -42,7 +44,20 @@ pub fn update(model: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
           effect.none(),
         )
       }
-    types.Tick -> #(model, effect.none())
-    // TODO
+    types.Tick ->
+      case model.auto_refresh {
+        True ->
+          case model.fetching {
+            True -> #(model, effects.schedule_next_tick(model.reload_seconds))
+            False -> #(
+              Model(..model, fetching: True),
+              effect.batch([
+                effects.fetch_deps(),
+                effects.schedule_next_tick(model.reload_seconds),
+              ]),
+            )
+          }
+        False -> #(model, effect.none())
+      }
   }
 }

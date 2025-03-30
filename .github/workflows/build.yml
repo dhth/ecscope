@@ -22,9 +22,15 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Install elm
-        uses: ./.github/actions/install-elm
-      - name: Compile elm to js
-        uses: ./.github/actions/compile-elm
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam run -m lustre/dev build app
       - name: Build
         run: cargo build

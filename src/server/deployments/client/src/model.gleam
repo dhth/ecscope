@@ -1,5 +1,5 @@
 import gleam/json
-import types.{type Status}
+import types.{type Status, Loading}
 
 pub type Model {
   Model(
@@ -8,6 +8,16 @@ pub type Model {
     auto_refresh: Bool,
     fetching: Bool,
     debug: Bool,
+  )
+}
+
+pub fn init_model() -> Model {
+  Model(
+    status: Loading,
+    reload_seconds: 5,
+    auto_refresh: False,
+    fetching: True,
+    debug: False,
   )
 }
 

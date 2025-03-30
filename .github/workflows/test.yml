@@ -28,17 +28,3 @@ jobs:
         uses: ./.github/actions/compile-elm
       - name: Run tests
         run: cargo test
-
-  test-client:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install elm
-        uses: ./.github/actions/install-elm
-      - name: Install elm-test
-        run: |
-          npm install elm-test -g
-      - name: Test
-        run: |
-          cd client/deps
-          elm-test

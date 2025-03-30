@@ -1,8 +1,8 @@
 import effects.{fetch_deps}
 import lustre
 import lustre/effect
-import model.{type Model, Model}
-import types.{type Msg, Loading}
+import model.{type Model, init_model}
+import types.{type Msg}
 import update
 import view
 
@@ -12,14 +12,5 @@ pub fn main() {
 }
 
 fn init(_) -> #(Model, effect.Effect(Msg)) {
-  #(
-    Model(
-      status: Loading,
-      reload_seconds: 5,
-      auto_refresh: False,
-      fetching: True,
-      debug: False,
-    ),
-    fetch_deps(),
-  )
+  #(init_model(), fetch_deps())
 }

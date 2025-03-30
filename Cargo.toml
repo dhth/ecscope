@@ -17,7 +17,9 @@ categories = [
 ]
 exclude = [
     ".github",
-    "client",
+    "src/server/deployments/client/src/**.gleam",
+    "src/server/deployments/client/gleam.toml",
+    "src/server/deployments/client/README.md",
 ]
 
 [dependencies]

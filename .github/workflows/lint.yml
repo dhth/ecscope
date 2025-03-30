@@ -21,10 +21,16 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy, rustfmt
-      - name: Install elm
-        uses: ./.github/actions/install-elm
-      - name: Compile elm to js
-        uses: ./.github/actions/compile-elm
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam run -m lustre/dev build app
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Lint
@@ -34,12 +40,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install elm-format
-        uses: jaxxstorm/action-install-gh-release@4304621e8c48d66093a8a214af5d5b5bc3b3d943
+      - uses: erlef/setup-beam@v1
         with:
-          repo: avh4/elm-format
-          tag: 0.8.7
-      - name: Check formatting
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
         run: |
-          cd client/deps
-          elm-format --validate src
+          cd src/server/deployments/client
+          gleam deps download
+          gleam format src --check

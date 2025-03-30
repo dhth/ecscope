@@ -25,6 +25,6 @@ post-announce-jobs = ["./publish-crates"]
 # Whether to enable GitHub Attestations
 github-attestations = true
 # https://opensource.axo.dev/cargo-dist/book/ci/customizing.html#customizing-build-setup
-github-build-setup = "../compile-elm-to-js.yml"
+github-build-setup = "../compile-gleam-to-js.yml"
 # This setting determines to what extent cargo-dist runs the release CI on pull-requests
 pr-run-mode = "upload"

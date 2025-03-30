@@ -2,3 +2,4 @@
 elm-stuff
 **.js
 **.mjs
+src/server/deployments/client/build

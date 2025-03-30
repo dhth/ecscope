@@ -16,12 +16,6 @@ h1 {
 	color: var(--heading);
 }
 
-/*.container {*/
-/*	max-width: 800px;*/
-/*	width: 100%;*/
-/*	padding: 1.5rem;*/
-/*}*/
-
 .row-failing {
 	background-color: var(--failing);
 	color: var(--bg);

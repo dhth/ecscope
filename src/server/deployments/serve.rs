@@ -19,7 +19,7 @@ use tower_http::services::ServeDir;
 
 const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
 const ROOT_HTML: &str = include_str!("client/index.html");
-const DEPS_JS: &str = include_str!("client/assets/js/deps.js");
+const DEPS_JS: &str = include_str!("client/priv/static/deps.mjs");
 
 #[derive(serde::Serialize)]
 struct GetDeploymentsResponse {
@@ -63,12 +63,12 @@ pub async fn serve_deployments(
     skip_opening: bool,
     env: Environment,
 ) -> Result<(), ServeDeploymentsError> {
-    let serve_dir = ServeDir::new("src/server/deployments/client/assets");
+    let serve_dir = ServeDir::new("src/server/deployments/client/priv/static");
     let cors = CorsLayer::new().allow_methods(Any).allow_origin(Any);
 
     let router = Router::new()
         .route("/", get(move || root_get(env)))
-        .route("/assets/js/deps.js", get(move || js_get(env)))
+        .route("/priv/static/js/deps.js", get(move || js_get(env)))
         .route("/dev/api/deps", get(fake_deployments_get))
         .route(
             "/api/deps",
@@ -77,7 +77,7 @@ pub async fn serve_deployments(
                 move || deployments_get(clusters, clients_map, state)
             }),
         )
-        .nest_service("/assets", serve_dir)
+        .nest_service("/priv/static", serve_dir)
         .layer(cors);
 
     let port = match std::env::var(ENV_VAR_PORT) {
@@ -131,7 +131,7 @@ async fn js_get(env: Environment) -> impl IntoResponse {
         Environment::Dev =>
         {
             #[allow(clippy::unwrap_used)]
-            tokio::fs::read_to_string("src/server/deployments/client/assets/js/deps.js")
+            tokio::fs::read_to_string("src/server/deployments/client/priv/static/deps.mjs")
                 .await
                 .unwrap()
         }

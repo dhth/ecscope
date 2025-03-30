@@ -248,15 +248,16 @@ fn service_name_table_data(deployment: types.Deployment) -> element.Element(Msg)
       ])
 
     _ ->
-      html.td([attribute.class("font-semibold text-[" <> service_color <> "]")], [
-        element.text(deployment.service_name),
-      ])
+      html.td(
+        [attribute.class("font-semibold text-[" <> service_color <> "]")],
+        [element.text(deployment.service_name)],
+      )
   }
 }
 
 fn deployment_results_divider() -> element.Element(Msg) {
   html.hr([
-    attribute.class("h-px my-10 bg-[#928374] border-0 dark:bg-[#928374]"),
+    attribute.class("border-y-2 my-10 border-[#504945]"),
     attribute.id("results-divider"),
   ])
 }
@@ -294,7 +295,7 @@ fn deployment_errors_table(
 }
 
 fn deployment_error_row(error: types.DeploymentError) -> element.Element(Msg) {
-  html.tr([], [
+  html.tr([attribute.class("border-y-2 border-[#504945]")], [
     error_table_service_name_td(error),
     html.td([], [element.text(error.keys)]),
     html.td([], error_with_new_lines(error.error)),
@@ -305,7 +306,7 @@ fn error_table_service_name_td(
   error: types.DeploymentError,
 ) -> element.Element(Msg) {
   let service_color = utils.color_for_string(error.service_name)
-  html.td([attribute.class("font-semibold text[" <> service_color <> "]")], [
+  html.td([attribute.class("font-semibold text-[" <> service_color <> "]")], [
     element.text(error.service_name),
   ])
 }
