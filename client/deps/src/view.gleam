@@ -12,16 +12,19 @@ import types.{type Msg}
 import utils
 
 pub fn view(model: Model) -> element.Element(Msg) {
-  html.div([attribute.class("container")], [
-    html.div([attribute.class("bg-[#282828] text-[#ebdbb2]")], [
+  html.div(
+    [attribute.class("w-2/3 mx-auto bg-[#282828] text-[#ebdbb2] mt-10")],
+    [
       html.div([], [
-        model_debug_div(model),
-        heading(model.fetching),
-        fetch_controls_div(model),
-        main_div(model),
+        html.div([], [
+          model_debug_div(model),
+          heading(model.fetching),
+          fetch_controls_div(model),
+          main_div(model),
+        ]),
       ]),
-    ]),
-  ])
+    ],
+  )
 }
 
 fn model_debug_div(model: Model) -> element.Element(Msg) {
@@ -78,6 +81,9 @@ fn fetch_controls_div(model: Model) -> element.Element(Msg) {
           attribute.checked(model.auto_refresh),
         ]),
         html.input([
+          attribute.class(
+            "w-12 h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] px-2",
+          ),
           attribute.id("auto-refresh-interval"),
           attribute.type_("number"),
           attribute.min("5"),
@@ -108,14 +114,14 @@ fn fetch_controls_div(model: Model) -> element.Element(Msg) {
 fn main_div(model: Model) -> element.Element(Msg) {
   case model.status {
     types.Errored(error) -> http_error_div(error)
-    types.Loaded(results) -> results_div(results.deployments, results.errors)
+    types.Loaded(results) -> results_div(results)
     types.Loading -> loading_div()
   }
 }
 
 fn http_error_div(error: lustre_http.HttpError) -> element.Element(Msg) {
   html.div([attribute.class("error-message")], [
-    html.p([], [element.text("Error" <> utils.http_error_to_string(error))]),
+    html.p([], [element.text("Error: " <> utils.http_error_to_string(error))]),
   ])
 }
 
@@ -127,20 +133,18 @@ fn loading_div() -> element.Element(Msg) {
   ])
 }
 
-fn results_div(
-  deployments: List(types.Deployment),
-  errors: List(types.DeploymentError),
-) -> element.Element(Msg) {
-  let deps_present = !list.is_empty(deployments)
-  let errors_present = !list.is_empty(errors)
+fn results_div(results: types.DeploymentResults) -> element.Element(Msg) {
+  let deps_present = !list.is_empty(results.deployments)
+  let errors_present = !list.is_empty(results.errors)
 
   let results = case deps_present, errors_present {
     False, False -> [no_deployment_results_div()]
-    True, False -> [deployment_details_div(deployments)]
-    False, True -> [deployment_errors_div(errors)]
+    True, False -> [deployment_details_div(results.deployments)]
+    False, True -> [deployment_errors_div(results.errors)]
     True, True -> [
-      deployment_details_div(deployments),
+      deployment_details_div(results.deployments),
       deployment_results_divider(),
+      deployment_errors_div(results.errors),
     ]
   }
 
@@ -202,8 +206,8 @@ fn deployments_table(
           html.th([], [element.text("Pending")]),
           html.th([], [element.text("Failed")]),
         ]),
-        html.tbody([], list.map(deployments, deployment_table_row)),
       ]),
+      html.tbody([], list.map(deployments, deployment_table_row)),
     ],
   )
 }
@@ -244,7 +248,7 @@ fn service_name_table_data(deployment: types.Deployment) -> element.Element(Msg)
       ])
 
     _ ->
-      html.td([attribute.class("font-semibold text[" <> service_color <> "]")], [
+      html.td([attribute.class("font-semibold text-[" <> service_color <> "]")], [
         element.text(deployment.service_name),
       ])
   }
@@ -262,9 +266,9 @@ fn deployment_errors_div(
 ) -> element.Element(Msg) {
   html.div([attribute.id("deployment-errors")], [
     html.h2([attribute.class("text-xl font-bold mb-6 text-[#fb4934]")], [
-      element.text("Error"),
-      deployment_errors_table(errors),
+      element.text("Errors"),
     ]),
+    deployment_errors_table(errors),
   ])
 }
 
@@ -274,7 +278,7 @@ fn deployment_errors_table(
   html.table(
     [
       attribute.class("table-auto w-full px-4 py-2"),
-      attribute.id("deployment-details-table"),
+      attribute.id("deployment-errors-table"),
     ],
     [
       html.thead([], [

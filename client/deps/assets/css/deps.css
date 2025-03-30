@@ -1,0 +1,123 @@
+:root {
+	--bg: #282828;
+	--fg: #ebdbb2;
+	--accent: #fabd2f;
+	--failing: #fb4934;
+	--active: #fabd2f;
+	--pending: #b8bb2f;
+	--border: #282828;
+	--heading: #b8bb26;
+    --draining: #928374;
+	--transition-duration: 0.5s;
+	font-size: 18px;
+}
+
+h1 {
+	color: var(--heading);
+}
+
+/*.container {*/
+/*	max-width: 800px;*/
+/*	width: 100%;*/
+/*	padding: 1.5rem;*/
+/*}*/
+
+.row-failing {
+	background-color: var(--failing);
+	color: var(--bg);
+	transition: background-color var(--transition-duration), color
+		var(--transition-duration);
+}
+.row-being-replaced {
+	background-color: var(--active);
+	color: var(--bg);
+	transition: background-color var(--transition-duration), color
+		var(--transition-duration);
+}
+.row-upcoming {
+	background-color: var(--pending);
+	color: var(--bg);
+	transition: background-color var(--transition-duration), color
+		var(--transition-duration);
+}
+.row-draining {
+	background-color: var(--draining);
+	color: var(--bg);
+	transition: background-color var(--transition-duration), color
+		var(--transition-duration);
+}
+
+table {
+	border-collapse: separate;
+	border-spacing: 0;
+	width: 100%;
+	overflow: hidden;
+	background-color: var(--bg);
+	table-layout: fixed;
+}
+th {
+	background-color: var(--border);
+	color: var(--fg);
+	padding: 12px;
+	text-align: left;
+	border-bottom: none;
+}
+
+#deployment-details-table th:first-child {
+	width: 30%;
+}
+#deployment-details-table th:nth-child(2) {
+	width: 20%;
+}
+#deployment-details-table th:nth-child(3),
+#deployment-details-table th:nth-child(4),
+#deployment-details-table th:nth-child(5),
+#deployment-details-table th:nth-child(6),
+#deployment-details-table th:nth-child(7) {
+	width: 10%;
+}
+
+td {
+	padding: 12px;
+	border-bottom: none;
+}
+tr:last-child td {
+	border-bottom: none;
+}
+
+#deployment-errors th:first-child {
+	width: 30%;
+}
+#deployment-errors th:nth-child(2) {
+	width: 20%;
+}
+
+.error-message {
+    color: #fe8019
+}
+
+.legend {
+    display: flex;
+    flex-wrap: wrap;
+    border: 2px solid #504945;
+}
+
+.legend-upcoming {
+    background-color: var(--pending);
+    color: var(--bg);
+}
+
+.legend-active {
+    background-color: var(--active);
+    color: var(--bg);
+}
+
+.legend-draining {
+    background-color: var(--draining);
+    color: var(--bg);
+}
+
+.legend-failing {
+    background-color: var(--failing);
+    color: var(--bg);
+}

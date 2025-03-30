@@ -14,6 +14,7 @@ use std::collections::HashMap;
 use std::io::Error as IOError;
 use std::sync::Arc;
 use tokio::signal;
+use tower_http::cors::{Any, CorsLayer};
 use tower_http::services::ServeDir;
 
 const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
@@ -63,6 +64,8 @@ pub async fn serve_deployments(
     env: Environment,
 ) -> Result<(), ServeDeploymentsError> {
     let serve_dir = ServeDir::new("src/server/deployments/client/assets");
+    let cors = CorsLayer::new().allow_methods(Any).allow_origin(Any);
+
     let router = Router::new()
         .route("/", get(move || root_get(env)))
         .route("/assets/js/deps.js", get(move || js_get(env)))
@@ -74,7 +77,8 @@ pub async fn serve_deployments(
                 move || deployments_get(clusters, clients_map, state)
             }),
         )
-        .nest_service("/assets", serve_dir);
+        .nest_service("/assets", serve_dir)
+        .layer(cors);
 
     let port = match std::env::var(ENV_VAR_PORT) {
         Ok(port_str) => match port_str.parse::<u16>() {
