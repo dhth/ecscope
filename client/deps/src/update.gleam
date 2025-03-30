@@ -1,15 +1,15 @@
 import effects
-import gleam/option
+import gleam/int
 import lustre/effect
 import model.{type Model, Model}
 import types.{type Msg}
 
 pub fn update(model: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
   case msg {
-    types.AutoRefreshScheduleChanged(maybe_seconds) ->
-      case maybe_seconds {
-        option.None -> #(Model(..model, reload_seconds: 5), effect.none())
-        option.Some(seconds) ->
+    types.AutoRefreshScheduleChanged(seconds_string) ->
+      case int.parse(seconds_string) {
+        Error(_) -> #(model, effect.none())
+        Ok(seconds) ->
           case seconds {
             s if s >= 5 && s <= 300 -> #(
               Model(..model, reload_seconds: s),

@@ -1,5 +1,5 @@
 import gleam/json
-import types.{type Status, Loading}
+import types.{type Status}
 
 pub type Model {
   Model(
@@ -18,14 +18,4 @@ pub fn encode_model(model: Model) -> json.Json {
     #("fetching", json.bool(model.fetching)),
     #("debug", json.bool(model.debug)),
   ])
-}
-
-pub fn initial_model() -> Model {
-  Model(
-    status: Loading,
-    reload_seconds: 5,
-    auto_refresh: False,
-    fetching: True,
-    debug: False,
-  )
 }

@@ -1,5 +1,4 @@
 import gleam/dynamic/decode
-import gleam/option
 import lustre_http
 
 pub type Deployment {
@@ -66,13 +65,10 @@ pub type Status {
   Errored(lustre_http.HttpError)
 }
 
-pub type RefreshScheduleNumSeconds =
-  option.Option(Int)
-
 pub type Msg {
   FetchResults
   AutoRefreshToggled(Bool)
-  AutoRefreshScheduleChanged(RefreshScheduleNumSeconds)
+  AutoRefreshScheduleChanged(String)
   ResultsFetched(Result(DeploymentResults, lustre_http.HttpError))
   Tick
 }
