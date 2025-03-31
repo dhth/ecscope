@@ -15,11 +15,12 @@ use std::io::Error as IOError;
 use std::sync::Arc;
 use tokio::signal;
 use tower_http::cors::{Any, CorsLayer};
-use tower_http::services::ServeDir;
 
 const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
 const ROOT_HTML: &str = include_str!("client/index.html");
 const DEPS_JS: &str = include_str!("client/priv/static/deps.mjs");
+const DEPS_CSS: &str = include_str!("client/priv/static/deps.css");
+const DEPS_FAVICON: &[u8] = include_bytes!("client/priv/static/favicon.png");
 
 #[derive(serde::Serialize)]
 struct GetDeploymentsResponse {
@@ -63,12 +64,13 @@ pub async fn serve_deployments(
     skip_opening: bool,
     env: Environment,
 ) -> Result<(), ServeDeploymentsError> {
-    let serve_dir = ServeDir::new("src/server/deployments/client/priv/static");
     let cors = CorsLayer::new().allow_methods(Any).allow_origin(Any);
 
     let router = Router::new()
         .route("/", get(move || root_get(env)))
-        .route("/priv/static/js/deps.js", get(move || js_get(env)))
+        .route("/priv/static/deps.mjs", get(move || js_get(env)))
+        .route("/priv/static/deps.css", get(move || css_get(env)))
+        .route("/priv/static/favicon.png", get(favicon_get))
         .route("/dev/api/deps", get(fake_deployments_get))
         .route(
             "/api/deps",
@@ -77,7 +79,6 @@ pub async fn serve_deployments(
                 move || deployments_get(clusters, clients_map, state)
             }),
         )
-        .nest_service("/priv/static", serve_dir)
         .layer(cors);
 
     let port = match std::env::var(ENV_VAR_PORT) {
@@ -138,6 +139,30 @@ async fn js_get(env: Environment) -> impl IntoResponse {
         Environment::Prod => DEPS_JS.to_string(),
     };
     (headers, js)
+}
+
+async fn css_get(env: Environment) -> impl IntoResponse {
+    let mut headers = HeaderMap::new();
+    #[allow(clippy::unwrap_used)]
+    headers.insert("Content-Type", "text/css".parse().unwrap());
+    let css = match env {
+        Environment::Dev =>
+        {
+            #[allow(clippy::unwrap_used)]
+            tokio::fs::read_to_string("src/server/deployments/client/priv/static/deps.css")
+                .await
+                .unwrap()
+        }
+        Environment::Prod => DEPS_CSS.to_string(),
+    };
+    (headers, css)
+}
+
+async fn favicon_get() -> impl IntoResponse {
+    let mut headers = HeaderMap::new();
+    #[allow(clippy::unwrap_used)]
+    headers.insert("Content-Type", "image/png".parse().unwrap());
+    (headers, DEPS_FAVICON)
 }
 
 async fn root_get(env: Environment) -> impl IntoResponse {
