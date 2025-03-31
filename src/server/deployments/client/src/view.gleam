@@ -62,27 +62,27 @@ fn heading(fetching: Bool) -> element.Element(Msg) {
 fn fetch_controls_div(model: Model) -> element.Element(Msg) {
   html.div([attribute.class("mb-4 flex items-center space-x-4")], [
     html.div(
-      [attribute.class("flex items-center space-x-2 py-2 rounded bg-[#282828]")],
+      [attribute.class("flex items-center space-x-2 py-2 bg-[#282828]")],
       [
-        html.label(
-          [
-            attribute.class("flex items-center space-x-2"),
-            attribute.for("auto-refresh-toggle"),
-          ],
-          [element.text("auto refresh every")],
-        ),
         html.input([
           attribute.class(
-            "w-4 h-4 text-[#fabd2f] bg-[#282828] rounded focus:ring-[#fabd2f]",
+            "w-4 h-4 text-[#fabd2f] bg-[#282828] focus:ring-[#fabd2f]",
           ),
           attribute.id("auto-refresh-toggle"),
           attribute.type_("checkbox"),
           event.on_check(types.AutoRefreshToggled),
           attribute.checked(model.auto_refresh),
         ]),
+        html.label(
+          [
+            attribute.class("items-center space-x-2"),
+            attribute.for("auto-refresh-toggle"),
+          ],
+          [element.text("auto refresh every")],
+        ),
         html.input([
           attribute.class(
-            "w-12 h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] px-2",
+            "h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] pl-3",
           ),
           attribute.id("auto-refresh-interval"),
           attribute.type_("number"),
@@ -92,13 +92,15 @@ fn fetch_controls_div(model: Model) -> element.Element(Msg) {
           attribute.disabled(model.auto_refresh),
           event.on_input(types.AutoRefreshScheduleChanged),
         ]),
+        html.p([attribute.class("items-center space-x-2")], [
+          element.text("seconds"),
+        ]),
         html.div([], [
           html.button(
             [
               attribute.id("manual-refresh"),
               attribute.class(
-                "font-semibold px-4 py-1 bg-[#d3869b]
-        text-[#282828] disabled:bg-[#928374]",
+                "font-semibold px-4 py-1 ml-4 bg-[#d3869b] text-[#282828] disabled:bg-[#928374]",
               ),
               attribute.disabled(model.auto_refresh || model.fetching),
               event.on_click(types.FetchResults),
