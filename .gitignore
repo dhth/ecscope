@@ -1,1 +1,3 @@
 /target
+**.min.mjs
+src/server/deployments/client/build

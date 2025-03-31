@@ -1,0 +1,18 @@
+name = "deps"
+version = "1.0.0"
+
+target = "javascript"
+
+# For a full reference of all the available options, you can have a look at
+# https://gleam.run/writing-gleam/gleam-toml/.
+
+[dependencies]
+gleam_stdlib = ">= 0.44.0 and < 2.0.0"
+lustre = ">= 4.6.4 and < 5.0.0"
+lustre_http = ">= 0.7.0 and < 1.0.0"
+gleam_json = ">= 2.3.0 and < 3.0.0"
+plinth = ">= 0.5.7 and < 1.0.0"
+
+[dev-dependencies]
+gleeunit = ">= 1.0.0 and < 2.0.0"
+lustre_dev_tools = ">= 1.6.5 and < 2.0.0"

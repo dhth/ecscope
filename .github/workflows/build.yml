@@ -24,3 +24,25 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
         run: cargo build
+
+  build-gleam:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam run -m lustre/dev build app
+      - name: Ensure compiled js files haven't changed
+        run: |
+          if git --no-pager diff --name-only | grep -q ".*.mjs"; then
+            echo "compiled js files have changed; compile them again"
+            git --no-pager diff --name-only
+            false
+          fi

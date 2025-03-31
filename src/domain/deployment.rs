@@ -1,9 +1,9 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
 pub struct DeploymentError {
     pub service_name: String,
     pub error: String,
     pub cluster_arn: String,
-    pub cluster_keys: Vec<String>,
+    pub keys: String,
 }
 
 impl std::fmt::Display for DeploymentError {
@@ -16,10 +16,24 @@ Cluster ARN : {}
 Keys        : {:?}
 Error       : {}"
 "#,
-            self.service_name, self.cluster_arn, self.cluster_keys, self.error,
+            self.service_name, self.cluster_arn, self.keys, self.error,
         )?;
 
         Ok(())
+    }
+}
+
+impl Ord for DeploymentError {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.service_name
+            .cmp(&other.service_name)
+            .then_with(|| self.keys.cmp(&other.keys))
+    }
+}
+
+impl PartialOrd for DeploymentError {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -36,6 +50,92 @@ pub struct DeploymentDetails {
     pub desired_count: i32,
     pub pending_count: i32,
     pub failed_count: i32,
+}
+
+impl Ord for DeploymentDetails {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.service_name
+            .cmp(&other.service_name)
+            .then_with(|| self.keys.cmp(&other.keys))
+    }
+}
+
+impl PartialOrd for DeploymentDetails {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl DeploymentDetails {
+    pub fn dummy_running(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "PRIMARY".to_string(),
+            running_count: 2,
+            desired_count: 2,
+            pending_count: 0,
+            failed_count: 0,
+        }
+    }
+
+    pub fn dummy_pending(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "PRIMARY".to_string(),
+            running_count: 0,
+            desired_count: 2,
+            pending_count: 2,
+            failed_count: 0,
+        }
+    }
+
+    pub fn dummy_active(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "ACTIVE".to_string(),
+            running_count: 2,
+            desired_count: 0,
+            pending_count: 0,
+            failed_count: 0,
+        }
+    }
+
+    pub fn dummy_failing(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "ACTIVE".to_string(),
+            running_count: 0,
+            desired_count: 2,
+            pending_count: 2,
+            failed_count: 3,
+        }
+    }
+
+    pub fn dummy_draining(name: &str, keys: &str) -> Self {
+        Self {
+            service_name: name.to_string(),
+            keys: keys.to_string(),
+            cluster_arn: "".to_string(),
+            deployment_id: "".to_string(),
+            status: "DRAINING".to_string(),
+            running_count: 0,
+            desired_count: 0,
+            pending_count: 0,
+            failed_count: 0,
+        }
+    }
 }
 
 impl std::fmt::Display for DeploymentDetails {

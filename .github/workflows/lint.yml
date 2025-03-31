@@ -13,7 +13,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lint:
+  lint-rust:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,3 +25,18 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Lint
         run: cargo clippy
+
+  lint-gleam:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam format src --check
