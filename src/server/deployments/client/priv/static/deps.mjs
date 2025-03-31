@@ -260,8 +260,8 @@ function bitArrayByteAt(buffer, bitOffset, index5) {
   }
 }
 var UtfCodepoint = class {
-  constructor(value3) {
-    this.value = value3;
+  constructor(value4) {
+    this.value = value4;
   }
 };
 var isBitArrayDeprecationMessagePrinted = {};
@@ -281,9 +281,9 @@ var Result = class _Result extends CustomType {
   }
 };
 var Ok = class extends Result {
-  constructor(value3) {
+  constructor(value4) {
     super();
-    this[0] = value3;
+    this[0] = value4;
   }
   // @internal
   isOk() {
@@ -453,9 +453,9 @@ function hashObject(o) {
   const proto = Object.getPrototypeOf(o);
   if (proto !== null && typeof proto.hashCode === "function") {
     try {
-      const code = o.hashCode(o);
-      if (typeof code === "number") {
-        return code;
+      const code2 = o.hashCode(o);
+      if (typeof code2 === "number") {
+        return code2;
       }
     } catch {
     }
@@ -608,17 +608,17 @@ function createNode(shift, key1, val1, key2hash, key2, val2) {
     addedLeaf
   );
 }
-function assoc(root, shift, hash, key, val, addedLeaf) {
+function assoc(root, shift, hash, key2, val, addedLeaf) {
   switch (root.type) {
     case ARRAY_NODE:
-      return assocArray(root, shift, hash, key, val, addedLeaf);
+      return assocArray(root, shift, hash, key2, val, addedLeaf);
     case INDEX_NODE:
-      return assocIndex(root, shift, hash, key, val, addedLeaf);
+      return assocIndex(root, shift, hash, key2, val, addedLeaf);
     case COLLISION_NODE:
-      return assocCollision(root, shift, hash, key, val, addedLeaf);
+      return assocCollision(root, shift, hash, key2, val, addedLeaf);
   }
 }
-function assocArray(root, shift, hash, key, val, addedLeaf) {
+function assocArray(root, shift, hash, key2, val, addedLeaf) {
   const idx = mask(hash, shift);
   const node = root.array[idx];
   if (node === void 0) {
@@ -626,11 +626,11 @@ function assocArray(root, shift, hash, key, val, addedLeaf) {
     return {
       type: ARRAY_NODE,
       size: root.size + 1,
-      array: cloneAndSet(root.array, idx, { type: ENTRY, k: key, v: val })
+      array: cloneAndSet(root.array, idx, { type: ENTRY, k: key2, v: val })
     };
   }
   if (node.type === ENTRY) {
-    if (isEqual(key, node.k)) {
+    if (isEqual(key2, node.k)) {
       if (val === node.v) {
         return root;
       }
@@ -639,7 +639,7 @@ function assocArray(root, shift, hash, key, val, addedLeaf) {
         size: root.size,
         array: cloneAndSet(root.array, idx, {
           type: ENTRY,
-          k: key,
+          k: key2,
           v: val
         })
       };
@@ -651,11 +651,11 @@ function assocArray(root, shift, hash, key, val, addedLeaf) {
       array: cloneAndSet(
         root.array,
         idx,
-        createNode(shift + SHIFT, node.k, node.v, hash, key, val)
+        createNode(shift + SHIFT, node.k, node.v, hash, key2, val)
       )
     };
   }
-  const n = assoc(node, shift + SHIFT, hash, key, val, addedLeaf);
+  const n = assoc(node, shift + SHIFT, hash, key2, val, addedLeaf);
   if (n === node) {
     return root;
   }
@@ -665,13 +665,13 @@ function assocArray(root, shift, hash, key, val, addedLeaf) {
     array: cloneAndSet(root.array, idx, n)
   };
 }
-function assocIndex(root, shift, hash, key, val, addedLeaf) {
+function assocIndex(root, shift, hash, key2, val, addedLeaf) {
   const bit = bitpos(hash, shift);
   const idx = index(root.bitmap, bit);
   if ((root.bitmap & bit) !== 0) {
     const node = root.array[idx];
     if (node.type !== ENTRY) {
-      const n = assoc(node, shift + SHIFT, hash, key, val, addedLeaf);
+      const n = assoc(node, shift + SHIFT, hash, key2, val, addedLeaf);
       if (n === node) {
         return root;
       }
@@ -682,7 +682,7 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
       };
     }
     const nodeKey = node.k;
-    if (isEqual(key, nodeKey)) {
+    if (isEqual(key2, nodeKey)) {
       if (val === node.v) {
         return root;
       }
@@ -691,7 +691,7 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
         bitmap: root.bitmap,
         array: cloneAndSet(root.array, idx, {
           type: ENTRY,
-          k: key,
+          k: key2,
           v: val
         })
       };
@@ -703,7 +703,7 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
       array: cloneAndSet(
         root.array,
         idx,
-        createNode(shift + SHIFT, nodeKey, node.v, hash, key, val)
+        createNode(shift + SHIFT, nodeKey, node.v, hash, key2, val)
       )
     };
   } else {
@@ -711,7 +711,7 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
     if (n >= MAX_INDEX_NODE) {
       const nodes = new Array(32);
       const jdx = mask(hash, shift);
-      nodes[jdx] = assocIndex(EMPTY, shift + SHIFT, hash, key, val, addedLeaf);
+      nodes[jdx] = assocIndex(EMPTY, shift + SHIFT, hash, key2, val, addedLeaf);
       let j = 0;
       let bitmap = root.bitmap;
       for (let i = 0; i < 32; i++) {
@@ -729,7 +729,7 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
     } else {
       const newArray = spliceIn(root.array, idx, {
         type: ENTRY,
-        k: key,
+        k: key2,
         v: val
       });
       addedLeaf.val = true;
@@ -741,9 +741,9 @@ function assocIndex(root, shift, hash, key, val, addedLeaf) {
     }
   }
 }
-function assocCollision(root, shift, hash, key, val, addedLeaf) {
+function assocCollision(root, shift, hash, key2, val, addedLeaf) {
   if (hash === root.hash) {
-    const idx = collisionIndexOf(root, key);
+    const idx = collisionIndexOf(root, key2);
     if (idx !== -1) {
       const entry = root.array[idx];
       if (entry.v === val) {
@@ -752,7 +752,7 @@ function assocCollision(root, shift, hash, key, val, addedLeaf) {
       return {
         type: COLLISION_NODE,
         hash,
-        array: cloneAndSet(root.array, idx, { type: ENTRY, k: key, v: val })
+        array: cloneAndSet(root.array, idx, { type: ENTRY, k: key2, v: val })
       };
     }
     const size = root.array.length;
@@ -760,7 +760,7 @@ function assocCollision(root, shift, hash, key, val, addedLeaf) {
     return {
       type: COLLISION_NODE,
       hash,
-      array: cloneAndSet(root.array, size, { type: ENTRY, k: key, v: val })
+      array: cloneAndSet(root.array, size, { type: ENTRY, k: key2, v: val })
     };
   }
   return assoc(
@@ -771,45 +771,45 @@ function assocCollision(root, shift, hash, key, val, addedLeaf) {
     },
     shift,
     hash,
-    key,
+    key2,
     val,
     addedLeaf
   );
 }
-function collisionIndexOf(root, key) {
+function collisionIndexOf(root, key2) {
   const size = root.array.length;
   for (let i = 0; i < size; i++) {
-    if (isEqual(key, root.array[i].k)) {
+    if (isEqual(key2, root.array[i].k)) {
       return i;
     }
   }
   return -1;
 }
-function find(root, shift, hash, key) {
+function find(root, shift, hash, key2) {
   switch (root.type) {
     case ARRAY_NODE:
-      return findArray(root, shift, hash, key);
+      return findArray(root, shift, hash, key2);
     case INDEX_NODE:
-      return findIndex(root, shift, hash, key);
+      return findIndex(root, shift, hash, key2);
     case COLLISION_NODE:
-      return findCollision(root, key);
+      return findCollision(root, key2);
   }
 }
-function findArray(root, shift, hash, key) {
+function findArray(root, shift, hash, key2) {
   const idx = mask(hash, shift);
   const node = root.array[idx];
   if (node === void 0) {
     return void 0;
   }
   if (node.type !== ENTRY) {
-    return find(node, shift + SHIFT, hash, key);
+    return find(node, shift + SHIFT, hash, key2);
   }
-  if (isEqual(key, node.k)) {
+  if (isEqual(key2, node.k)) {
     return node;
   }
   return void 0;
 }
-function findIndex(root, shift, hash, key) {
+function findIndex(root, shift, hash, key2) {
   const bit = bitpos(hash, shift);
   if ((root.bitmap & bit) === 0) {
     return void 0;
@@ -817,31 +817,31 @@ function findIndex(root, shift, hash, key) {
   const idx = index(root.bitmap, bit);
   const node = root.array[idx];
   if (node.type !== ENTRY) {
-    return find(node, shift + SHIFT, hash, key);
+    return find(node, shift + SHIFT, hash, key2);
   }
-  if (isEqual(key, node.k)) {
+  if (isEqual(key2, node.k)) {
     return node;
   }
   return void 0;
 }
-function findCollision(root, key) {
-  const idx = collisionIndexOf(root, key);
+function findCollision(root, key2) {
+  const idx = collisionIndexOf(root, key2);
   if (idx < 0) {
     return void 0;
   }
   return root.array[idx];
 }
-function without(root, shift, hash, key) {
+function without(root, shift, hash, key2) {
   switch (root.type) {
     case ARRAY_NODE:
-      return withoutArray(root, shift, hash, key);
+      return withoutArray(root, shift, hash, key2);
     case INDEX_NODE:
-      return withoutIndex(root, shift, hash, key);
+      return withoutIndex(root, shift, hash, key2);
     case COLLISION_NODE:
-      return withoutCollision(root, key);
+      return withoutCollision(root, key2);
   }
 }
-function withoutArray(root, shift, hash, key) {
+function withoutArray(root, shift, hash, key2) {
   const idx = mask(hash, shift);
   const node = root.array[idx];
   if (node === void 0) {
@@ -849,11 +849,11 @@ function withoutArray(root, shift, hash, key) {
   }
   let n = void 0;
   if (node.type === ENTRY) {
-    if (!isEqual(node.k, key)) {
+    if (!isEqual(node.k, key2)) {
       return root;
     }
   } else {
-    n = without(node, shift + SHIFT, hash, key);
+    n = without(node, shift + SHIFT, hash, key2);
     if (n === node) {
       return root;
     }
@@ -902,7 +902,7 @@ function withoutArray(root, shift, hash, key) {
     array: cloneAndSet(root.array, idx, n)
   };
 }
-function withoutIndex(root, shift, hash, key) {
+function withoutIndex(root, shift, hash, key2) {
   const bit = bitpos(hash, shift);
   if ((root.bitmap & bit) === 0) {
     return root;
@@ -910,7 +910,7 @@ function withoutIndex(root, shift, hash, key) {
   const idx = index(root.bitmap, bit);
   const node = root.array[idx];
   if (node.type !== ENTRY) {
-    const n = without(node, shift + SHIFT, hash, key);
+    const n = without(node, shift + SHIFT, hash, key2);
     if (n === node) {
       return root;
     }
@@ -930,7 +930,7 @@ function withoutIndex(root, shift, hash, key) {
       array: spliceOut(root.array, idx)
     };
   }
-  if (isEqual(key, node.k)) {
+  if (isEqual(key2, node.k)) {
     if (root.bitmap === bit) {
       return void 0;
     }
@@ -942,8 +942,8 @@ function withoutIndex(root, shift, hash, key) {
   }
   return root;
 }
-function withoutCollision(root, key) {
-  const idx = collisionIndexOf(root, key);
+function withoutCollision(root, key2) {
+  const idx = collisionIndexOf(root, key2);
   if (idx < 0) {
     return root;
   }
@@ -1018,11 +1018,11 @@ var Dict = class _Dict {
    * @param {NotFound} notFound
    * @returns {NotFound | V}
    */
-  get(key, notFound) {
+  get(key2, notFound) {
     if (this.root === void 0) {
       return notFound;
     }
-    const found = find(this.root, 0, getHash(key), key);
+    const found = find(this.root, 0, getHash(key2), key2);
     if (found === void 0) {
       return notFound;
     }
@@ -1033,10 +1033,10 @@ var Dict = class _Dict {
    * @param {V} val
    * @returns {Dict<K,V>}
    */
-  set(key, val) {
+  set(key2, val) {
     const addedLeaf = { val: false };
     const root = this.root === void 0 ? EMPTY : this.root;
-    const newRoot = assoc(root, 0, getHash(key), key, val, addedLeaf);
+    const newRoot = assoc(root, 0, getHash(key2), key2, val, addedLeaf);
     if (newRoot === this.root) {
       return this;
     }
@@ -1046,11 +1046,11 @@ var Dict = class _Dict {
    * @param {K} key
    * @returns {Dict<K,V>}
    */
-  delete(key) {
+  delete(key2) {
     if (this.root === void 0) {
       return this;
     }
-    const newRoot = without(this.root, 0, getHash(key), key);
+    const newRoot = without(this.root, 0, getHash(key2), key2);
     if (newRoot === this.root) {
       return this;
     }
@@ -1063,11 +1063,11 @@ var Dict = class _Dict {
    * @param {K} key
    * @returns {boolean}
    */
-  has(key) {
+  has(key2) {
     if (this.root === void 0) {
       return false;
     }
-    return find(this.root, 0, getHash(key), key) !== void 0;
+    return find(this.root, 0, getHash(key2), key2) !== void 0;
   }
   /**
    * @returns {[K,V][]}
@@ -1125,9 +1125,9 @@ var NOT_FOUND = {};
 function identity(x) {
   return x;
 }
-function parse_int(value3) {
-  if (/^[-+]?(\d+)$/.test(value3)) {
-    return new Ok(parseInt(value3));
+function parse_int(value4) {
+  if (/^[-+]?(\d+)$/.test(value4)) {
+    return new Ok(parseInt(value4));
   } else {
     return new Error(Nil);
   }
@@ -1136,43 +1136,43 @@ function to_string(term) {
   return term.toString();
 }
 function float_to_string(float4) {
-  const string5 = float4.toString().replace("+", "");
-  if (string5.indexOf(".") >= 0) {
-    return string5;
+  const string6 = float4.toString().replace("+", "");
+  if (string6.indexOf(".") >= 0) {
+    return string6;
   } else {
-    const index5 = string5.indexOf("e");
+    const index5 = string6.indexOf("e");
     if (index5 >= 0) {
-      return string5.slice(0, index5) + ".0" + string5.slice(index5);
+      return string6.slice(0, index5) + ".0" + string6.slice(index5);
     } else {
-      return string5 + ".0";
+      return string6 + ".0";
     }
   }
 }
-function graphemes(string5) {
-  const iterator = graphemes_iterator(string5);
+function graphemes(string6) {
+  const iterator = graphemes_iterator(string6);
   if (iterator) {
     return List.fromArray(Array.from(iterator).map((item) => item.segment));
   } else {
-    return List.fromArray(string5.match(/./gsu));
+    return List.fromArray(string6.match(/./gsu));
   }
 }
 var segmenter = void 0;
-function graphemes_iterator(string5) {
+function graphemes_iterator(string6) {
   if (globalThis.Intl && Intl.Segmenter) {
     segmenter ||= new Intl.Segmenter();
-    return segmenter.segment(string5)[Symbol.iterator]();
+    return segmenter.segment(string6)[Symbol.iterator]();
   }
 }
-function pop_grapheme(string5) {
+function pop_grapheme(string6) {
   let first3;
-  const iterator = graphemes_iterator(string5);
+  const iterator = graphemes_iterator(string6);
   if (iterator) {
     first3 = iterator.next().value?.segment;
   } else {
-    first3 = string5.match(/./su)?.[0];
+    first3 = string6.match(/./su)?.[0];
   }
   if (first3) {
-    return new Ok([first3, string5.slice(first3.length)]);
+    return new Ok([first3, string6.slice(first3.length)]);
   } else {
     return new Error(Nil);
   }
@@ -1180,8 +1180,8 @@ function pop_grapheme(string5) {
 function pop_codeunit(str) {
   return [str.charCodeAt(0) | 0, str.slice(1)];
 }
-function lowercase(string5) {
-  return string5.toLowerCase();
+function lowercase(string6) {
+  return string6.toLowerCase();
 }
 function split(xs, pattern) {
   return List.fromArray(xs.split(pattern));
@@ -1226,8 +1226,8 @@ var trim_end_regex = /* @__PURE__ */ new RegExp(`[${unicode_whitespaces}]*$`);
 function codepoint(int4) {
   return new UtfCodepoint(int4);
 }
-function string_to_codepoint_integer_list(string5) {
-  return List.fromArray(Array.from(string5).map((item) => item.codePointAt(0)));
+function string_to_codepoint_integer_list(string6) {
+  return List.fromArray(Array.from(string6).map((item) => item.codePointAt(0)));
 }
 function utf_codepoint_to_int(utf_codepoint) {
   return utf_codepoint.value;
@@ -1238,15 +1238,15 @@ function new_map() {
 function map_to_list(map7) {
   return List.fromArray(map7.entries());
 }
-function map_get(map7, key) {
-  const value3 = map7.get(key, NOT_FOUND);
-  if (value3 === NOT_FOUND) {
+function map_get(map7, key2) {
+  const value4 = map7.get(key2, NOT_FOUND);
+  if (value4 === NOT_FOUND) {
     return new Error(Nil);
   }
-  return new Ok(value3);
+  return new Ok(value4);
 }
-function map_insert(key, value3, map7) {
-  return map7.set(key, value3);
+function map_insert(key2, value4, map7) {
+  return map7.set(key2, value4);
 }
 function classify_dynamic(data) {
   if (typeof data === "string") {
@@ -1293,22 +1293,22 @@ function decode_int(data) {
 function decode_bool(data) {
   return typeof data === "boolean" ? new Ok(data) : decoder_error("Bool", data);
 }
-function decode_field(value3, name) {
-  const not_a_map_error = () => decoder_error("Dict", value3);
-  if (value3 instanceof Dict || value3 instanceof WeakMap || value3 instanceof Map) {
-    const entry = map_get(value3, name);
+function decode_field(value4, name) {
+  const not_a_map_error = () => decoder_error("Dict", value4);
+  if (value4 instanceof Dict || value4 instanceof WeakMap || value4 instanceof Map) {
+    const entry = map_get(value4, name);
     return new Ok(entry.isOk() ? new Some(entry[0]) : new None());
-  } else if (value3 === null) {
+  } else if (value4 === null) {
     return not_a_map_error();
-  } else if (Object.getPrototypeOf(value3) == Object.prototype) {
-    return try_get_field(value3, name, () => new Ok(new None()));
+  } else if (Object.getPrototypeOf(value4) == Object.prototype) {
+    return try_get_field(value4, name, () => new Ok(new None()));
   } else {
-    return try_get_field(value3, name, not_a_map_error);
+    return try_get_field(value4, name, not_a_map_error);
   }
 }
-function try_get_field(value3, field3, or_else) {
+function try_get_field(value4, field3, or_else) {
   try {
-    return field3 in value3 ? new Ok(new Some(value3[field3])) : or_else();
+    return field3 in value4 ? new Ok(new Some(value4[field3])) : or_else();
   } catch {
     return or_else();
   }
@@ -1390,15 +1390,15 @@ function inspectString(str) {
   return new_str;
 }
 function inspectDict(map7) {
-  let body = "dict.from_list([";
+  let body2 = "dict.from_list([";
   let first3 = true;
-  map7.forEach((value3, key) => {
+  map7.forEach((value4, key2) => {
     if (!first3)
-      body = body + ", ";
-    body = body + "#(" + inspect(key) + ", " + inspect(value3) + ")";
+      body2 = body2 + ", ";
+    body2 = body2 + "#(" + inspect(key2) + ", " + inspect(value4) + ")";
     first3 = false;
   });
-  return body + "])";
+  return body2 + "])";
 }
 function inspectObject(v) {
   const name = Object.getPrototypeOf(v)?.constructor?.name || "Object";
@@ -1406,14 +1406,14 @@ function inspectObject(v) {
   for (const k of Object.keys(v)) {
     props.push(`${inspect(k)}: ${inspect(v[k])}`);
   }
-  const body = props.length ? " " + props.join(", ") + " " : "";
+  const body2 = props.length ? " " + props.join(", ") + " " : "";
   const head = name === "Object" ? "" : name + " ";
-  return `//js(${head}{${body}})`;
+  return `//js(${head}{${body2}})`;
 }
 function inspectCustomType(record) {
   const props = Object.keys(record).map((label2) => {
-    const value3 = inspect(record[label2]);
-    return isNaN(parseInt(label2)) ? `${label2}: ${value3}` : value3;
+    const value4 = inspect(record[label2]);
+    return isNaN(parseInt(label2)) ? `${label2}: ${value4}` : value4;
   }).join(", ");
   return props ? `${record.constructor.name}(${props})` : record.constructor.name;
 }
@@ -1452,8 +1452,8 @@ function remainder(dividend, divisor) {
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/dict.mjs
-function insert(dict2, key, value3) {
-  return map_insert(key, value3, dict2);
+function insert(dict2, key2, value4) {
+  return map_insert(key2, value4, dict2);
 }
 function reverse_and_concat(loop$remaining, loop$accumulator) {
   while (true) {
@@ -1476,10 +1476,10 @@ function do_keys_loop(loop$list, loop$acc) {
     if (list3.hasLength(0)) {
       return reverse_and_concat(acc, toList([]));
     } else {
-      let key = list3.head[0];
+      let key2 = list3.head[0];
       let rest = list3.tail;
       loop$list = rest;
-      loop$acc = prepend(key, acc);
+      loop$acc = prepend(key2, acc);
     }
   }
 }
@@ -1638,19 +1638,19 @@ function concat2(strings) {
 }
 function drop_start(loop$string, loop$num_graphemes) {
   while (true) {
-    let string5 = loop$string;
+    let string6 = loop$string;
     let num_graphemes = loop$num_graphemes;
     let $ = num_graphemes > 0;
     if (!$) {
-      return string5;
+      return string6;
     } else {
-      let $1 = pop_grapheme(string5);
+      let $1 = pop_grapheme(string6);
       if ($1.isOk()) {
         let string$1 = $1[0][1];
         loop$string = string$1;
         loop$num_graphemes = num_graphemes - 1;
       } else {
-        return string5;
+        return string6;
       }
     }
   }
@@ -1665,13 +1665,13 @@ function split3(x, substring) {
     return map(_pipe$2, identity);
   }
 }
-function do_to_utf_codepoints(string5) {
-  let _pipe = string5;
+function do_to_utf_codepoints(string6) {
+  let _pipe = string6;
   let _pipe$1 = string_to_codepoint_integer_list(_pipe);
   return map(_pipe$1, codepoint);
 }
-function to_utf_codepoints(string5) {
-  return do_to_utf_codepoints(string5);
+function to_utf_codepoints(string6) {
+  return do_to_utf_codepoints(string6);
 }
 function inspect2(term) {
   let _pipe = inspect(term);
@@ -1735,7 +1735,7 @@ function map_errors(result, f) {
     }
   );
 }
-function string(data) {
+function string2(data) {
   return decode_string(data);
 }
 function bool(data) {
@@ -1789,10 +1789,10 @@ function push_path(error, name) {
   );
 }
 function field(name, inner_type) {
-  return (value3) => {
+  return (value4) => {
     let missing_field_error = new DecodeError("field", "nothing", toList([]));
     return try$(
-      decode_field(value3, name),
+      decode_field(value4, name),
       (maybe_inner) => {
         let _pipe = maybe_inner;
         let _pipe$1 = to_result(_pipe, toList([missing_field_error]));
@@ -1809,27 +1809,27 @@ function field(name, inner_type) {
 }
 
 // build/dev/javascript/gleam_stdlib/gleam_stdlib_decode_ffi.mjs
-function index2(data, key) {
+function index2(data, key2) {
   if (data instanceof Dict || data instanceof WeakMap || data instanceof Map) {
     const token = {};
-    const entry = data.get(key, token);
+    const entry = data.get(key2, token);
     if (entry === token)
       return new Ok(new None());
     return new Ok(new Some(entry));
   }
-  const key_is_int = Number.isInteger(key);
-  if (key_is_int && key >= 0 && key < 8 && data instanceof List) {
+  const key_is_int = Number.isInteger(key2);
+  if (key_is_int && key2 >= 0 && key2 < 8 && data instanceof List) {
     let i = 0;
-    for (const value3 of data) {
-      if (i === key)
-        return new Ok(new Some(value3));
+    for (const value4 of data) {
+      if (i === key2)
+        return new Ok(new Some(value4));
       i++;
     }
     return new Error("Indexable");
   }
   if (key_is_int && Array.isArray(data) || data && typeof data === "object" || data && Object.getPrototypeOf(data) === Object.prototype) {
-    if (key in data)
-      return new Ok(new Some(data[key]));
+    if (key2 in data)
+      return new Ok(new Some(data[key2]));
     return new Ok(new None());
   }
   return new Error(key_is_int ? "Indexable" : "Dict");
@@ -1857,7 +1857,7 @@ function int(data) {
     return new Ok(data);
   return new Error(0);
 }
-function string2(data) {
+function string3(data) {
   if (typeof data === "string")
     return new Ok(data);
   return new Error(0);
@@ -1958,9 +1958,9 @@ function decode_int2(data) {
 }
 var int2 = /* @__PURE__ */ new Decoder(decode_int2);
 function decode_string2(data) {
-  return run_dynamic_function(data, "String", string2);
+  return run_dynamic_function(data, "String", string3);
 }
-var string3 = /* @__PURE__ */ new Decoder(decode_string2);
+var string4 = /* @__PURE__ */ new Decoder(decode_string2);
 function list2(inner) {
   return new Decoder(
     (data) => {
@@ -1978,7 +1978,7 @@ function list2(inner) {
 }
 function push_path2(layer, path) {
   let decoder = one_of(
-    string3,
+    string4,
     toList([
       (() => {
         let _pipe = int2;
@@ -1988,8 +1988,8 @@ function push_path2(layer, path) {
   );
   let path$1 = map(
     path,
-    (key) => {
-      let key$1 = identity(key);
+    (key2) => {
+      let key$1 = identity(key2);
       let $ = run(key$1, decoder);
       if ($.isOk()) {
         let key$2 = $[0];
@@ -2023,18 +2023,18 @@ function index3(loop$path, loop$position, loop$inner, loop$data, loop$handle_mis
       let _pipe = inner(data);
       return push_path2(_pipe, reverse(position));
     } else {
-      let key = path.head;
+      let key2 = path.head;
       let path$1 = path.tail;
-      let $ = index2(data, key);
+      let $ = index2(data, key2);
       if ($.isOk() && $[0] instanceof Some) {
         let data$1 = $[0][0];
         loop$path = path$1;
-        loop$position = prepend(key, position);
+        loop$position = prepend(key2, position);
         loop$inner = inner;
         loop$data = data$1;
         loop$handle_miss = handle_miss;
       } else if ($.isOk() && $[0] instanceof None) {
-        return handle_miss(data, prepend(key, position));
+        return handle_miss(data, prepend(key2, position));
       } else {
         let kind = $[0];
         let $1 = inner(data);
@@ -2098,12 +2098,12 @@ function object(entries) {
 function identity2(x) {
   return x;
 }
-function decode(string5) {
+function decode(string6) {
   try {
-    const result = JSON.parse(string5);
+    const result = JSON.parse(string6);
     return new Ok(result);
   } catch (err) {
-    return new Error(getJsonDecodeError(err, string5));
+    return new Error(getJsonDecodeError(err, string6));
   }
 }
 function getJsonDecodeError(stdErr, json) {
@@ -2168,12 +2168,12 @@ function jsCoreUnexpectedByteError(err) {
 function toHex(char) {
   return "0x" + char.charCodeAt(0).toString(16).toUpperCase();
 }
-function getPositionFromMultiline(line, column, string5) {
+function getPositionFromMultiline(line, column, string6) {
   if (line === 1)
     return column - 1;
   let currentLn = 1;
   let position = 0;
-  string5.split("").find((char, idx) => {
+  string6.split("").find((char, idx) => {
     if (char === "\n")
       currentLn += 1;
     if (currentLn === line) {
@@ -2274,10 +2274,10 @@ var Text = class extends CustomType {
     this.content = content;
   }
 };
-var Element = class extends CustomType {
-  constructor(key, namespace, tag, attrs, children2, self_closing, void$) {
+var Element2 = class extends CustomType {
+  constructor(key2, namespace, tag, attrs, children2, self_closing, void$) {
     super();
-    this.key = key;
+    this.key = key2;
     this.namespace = namespace;
     this.tag = tag;
     this.attrs = attrs;
@@ -2300,7 +2300,7 @@ var Attribute = class extends CustomType {
     this.as_property = as_property;
   }
 };
-var Event = class extends CustomType {
+var Event2 = class extends CustomType {
   constructor(x0, x1) {
     super();
     this[0] = x0;
@@ -2317,12 +2317,12 @@ function attribute_to_event_handler(attribute2) {
     return new Ok([name$1, handler]);
   }
 }
-function do_element_list_handlers(elements2, handlers2, key) {
+function do_element_list_handlers(elements2, handlers2, key2) {
   return index_fold(
     elements2,
     handlers2,
     (handlers3, element2, index5) => {
-      let key$1 = key + "-" + to_string(index5);
+      let key$1 = key2 + "-" + to_string(index5);
       return do_handlers(element2, handlers3, key$1);
     }
   );
@@ -2331,14 +2331,14 @@ function do_handlers(loop$element, loop$handlers, loop$key) {
   while (true) {
     let element2 = loop$element;
     let handlers2 = loop$handlers;
-    let key = loop$key;
+    let key2 = loop$key;
     if (element2 instanceof Text) {
       return handlers2;
     } else if (element2 instanceof Map2) {
       let subtree = element2.subtree;
       loop$element = subtree();
       loop$handlers = handlers2;
-      loop$key = key;
+      loop$key = key2;
     } else {
       let attrs = element2.attrs;
       let children2 = element2.children;
@@ -2350,13 +2350,13 @@ function do_handlers(loop$element, loop$handlers, loop$key) {
           if ($.isOk()) {
             let name = $[0][0];
             let handler = $[0][1];
-            return insert(handlers3, key + "-" + name, handler);
+            return insert(handlers3, key2 + "-" + name, handler);
           } else {
             return handlers3;
           }
         }
       );
-      return do_element_list_handlers(children2, handlers$1, key);
+      return do_element_list_handlers(children2, handlers$1, key2);
     }
   }
 }
@@ -2365,14 +2365,14 @@ function handlers(element2) {
 }
 
 // build/dev/javascript/lustre/lustre/attribute.mjs
-function attribute(name, value3) {
-  return new Attribute(name, identity(value3), false);
+function attribute(name, value4) {
+  return new Attribute(name, identity(value4), false);
 }
-function property(name, value3) {
-  return new Attribute(name, identity(value3), true);
+function property(name, value4) {
+  return new Attribute(name, identity(value4), true);
 }
 function on(name, handler) {
-  return new Event("on" + name, handler);
+  return new Event2("on" + name, handler);
 }
 function class$(name) {
   return attribute("class", name);
@@ -2404,42 +2404,42 @@ function min(val) {
 function href(uri) {
   return attribute("href", uri);
 }
-function target(target2) {
-  return attribute("target", target2);
+function target(target3) {
+  return attribute("target", target3);
 }
 
 // build/dev/javascript/lustre/lustre/element.mjs
 function element(tag, attrs, children2) {
   if (tag === "area") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "base") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "br") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "col") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "embed") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "hr") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "img") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "input") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "link") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "meta") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "param") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "source") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "track") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else if (tag === "wbr") {
-    return new Element("", "", tag, attrs, toList([]), false, true);
+    return new Element2("", "", tag, attrs, toList([]), false, true);
   } else {
-    return new Element("", "", tag, attrs, children2, false, false);
+    return new Element2("", "", tag, attrs, children2, false, false);
   }
 }
 function text(content) {
@@ -2521,7 +2521,7 @@ var Emit2 = class extends CustomType {
     this[1] = x1;
   }
 };
-var Event2 = class extends CustomType {
+var Event3 = class extends CustomType {
   constructor(x0, x1) {
     super();
     this[0] = x0;
@@ -2624,15 +2624,15 @@ function createElementNode({ prev, next, dispatch, stack }) {
   const delegated = [];
   for (const attr of next.attrs) {
     const name = attr[0];
-    const value3 = attr[1];
+    const value4 = attr[1];
     if (attr.as_property) {
-      if (el[name] !== value3)
-        el[name] = value3;
+      if (el[name] !== value4)
+        el[name] = value4;
       if (canMorph)
         prevAttributes.delete(name);
     } else if (name.startsWith("on")) {
       const eventName = name.slice(2);
-      const callback = dispatch(value3, eventName === "input");
+      const callback = dispatch(value4, eventName === "input");
       if (!handlersForEl.has(eventName)) {
         el.addEventListener(eventName, lustreGenericEventHandler);
       }
@@ -2646,25 +2646,25 @@ function createElementNode({ prev, next, dispatch, stack }) {
         el.addEventListener(eventName, lustreGenericEventHandler);
       }
       handlersForEl.set(eventName, callback);
-      el.setAttribute(name, value3);
+      el.setAttribute(name, value4);
       if (canMorph) {
         prevHandlers.delete(eventName);
         prevAttributes.delete(name);
       }
     } else if (name.startsWith("delegate:data-") || name.startsWith("delegate:aria-")) {
-      el.setAttribute(name, value3);
-      delegated.push([name.slice(10), value3]);
+      el.setAttribute(name, value4);
+      delegated.push([name.slice(10), value4]);
     } else if (name === "class") {
-      className = className === null ? value3 : className + " " + value3;
+      className = className === null ? value4 : className + " " + value4;
     } else if (name === "style") {
-      style2 = style2 === null ? value3 : style2 + value3;
+      style2 = style2 === null ? value4 : style2 + value4;
     } else if (name === "dangerous-unescaped-html") {
-      innerHTML = value3;
+      innerHTML = value4;
     } else {
-      if (el.getAttribute(name) !== value3)
-        el.setAttribute(name, value3);
+      if (el.getAttribute(name) !== value4)
+        el.setAttribute(name, value4);
       if (name === "value" || name === "selected")
-        el[name] = value3;
+        el[name] = value4;
       if (canMorph)
         prevAttributes.delete(name);
     }
@@ -2691,9 +2691,9 @@ function createElementNode({ prev, next, dispatch, stack }) {
   if (next.tag === "slot") {
     window.queueMicrotask(() => {
       for (const child of el.assignedElements()) {
-        for (const [name, value3] of delegated) {
+        for (const [name, value4] of delegated) {
           if (!child.hasAttribute(name)) {
-            child.setAttribute(name, value3);
+            child.setAttribute(name, value4);
           }
         }
       }
@@ -2742,14 +2742,14 @@ function createElementNode({ prev, next, dispatch, stack }) {
 }
 var registeredHandlers = /* @__PURE__ */ new WeakMap();
 function lustreGenericEventHandler(event2) {
-  const target2 = event2.currentTarget;
-  if (!registeredHandlers.has(target2)) {
-    target2.removeEventListener(event2.type, lustreGenericEventHandler);
+  const target3 = event2.currentTarget;
+  if (!registeredHandlers.has(target3)) {
+    target3.removeEventListener(event2.type, lustreGenericEventHandler);
     return;
   }
-  const handlersForEventTarget = registeredHandlers.get(target2);
+  const handlersForEventTarget = registeredHandlers.get(target3);
   if (!handlersForEventTarget.has(event2.type)) {
-    target2.removeEventListener(event2.type, lustreGenericEventHandler);
+    target3.removeEventListener(event2.type, lustreGenericEventHandler);
     return;
   }
   handlersForEventTarget.get(event2.type)(event2);
@@ -2789,9 +2789,9 @@ function getKeyedChildren(el) {
   const keyedChildren = /* @__PURE__ */ new Map();
   if (el) {
     for (const child of children(el)) {
-      const key = child?.key || child?.getAttribute?.("data-lustre-key");
-      if (key)
-        keyedChildren.set(key, child);
+      const key2 = child?.key || child?.getAttribute?.("data-lustre-key");
+      if (key2)
+        keyedChildren.set(key2, child);
     }
   }
   return keyedChildren;
@@ -3039,7 +3039,7 @@ var LustreServerApplication = class _LustreServerApplication {
       for (const [_, renderer] of this.#renderers) {
         renderer(event2);
       }
-    } else if (action instanceof Event2) {
+    } else if (action instanceof Event3) {
       const handler = this.#handlers.get(action[0]);
       if (!handler)
         return;
@@ -3750,8 +3750,8 @@ function parse_userinfo_loop(loop$original, loop$uri_string, loop$pieces, loop$s
     }
   }
 }
-function parse_authority_pieces(string5, pieces) {
-  return parse_userinfo_loop(string5, string5, pieces, 0);
+function parse_authority_pieces(string6, pieces) {
+  return parse_userinfo_loop(string6, string6, pieces, 0);
 }
 function parse_authority_with_slashes(uri_string, pieces) {
   if (uri_string === "//") {
@@ -4034,11 +4034,11 @@ function scheme_from_string(scheme) {
 
 // build/dev/javascript/gleam_http/gleam/http/request.mjs
 var Request = class extends CustomType {
-  constructor(method, headers, body, scheme, host, port, path, query) {
+  constructor(method, headers, body2, scheme, host, port, path, query) {
     super();
     this.method = method;
     this.headers = headers;
-    this.body = body;
+    this.body = body2;
     this.scheme = scheme;
     this.host = host;
     this.port = port;
@@ -4095,11 +4095,11 @@ function to(url) {
 
 // build/dev/javascript/gleam_http/gleam/http/response.mjs
 var Response = class extends CustomType {
-  constructor(status, headers, body) {
+  constructor(status, headers, body2) {
     super();
     this.status = status;
     this.headers = headers;
-    this.body = body;
+    this.body = body2;
   }
 };
 
@@ -4108,22 +4108,22 @@ var PromiseLayer = class _PromiseLayer {
   constructor(promise) {
     this.promise = promise;
   }
-  static wrap(value3) {
-    return value3 instanceof Promise ? new _PromiseLayer(value3) : value3;
+  static wrap(value4) {
+    return value4 instanceof Promise ? new _PromiseLayer(value4) : value4;
   }
-  static unwrap(value3) {
-    return value3 instanceof _PromiseLayer ? value3.promise : value3;
+  static unwrap(value4) {
+    return value4 instanceof _PromiseLayer ? value4.promise : value4;
   }
 };
-function resolve(value3) {
-  return Promise.resolve(PromiseLayer.wrap(value3));
+function resolve(value4) {
+  return Promise.resolve(PromiseLayer.wrap(value4));
 }
 function then_await(promise, fn) {
-  return promise.then((value3) => fn(PromiseLayer.unwrap(value3)));
+  return promise.then((value4) => fn(PromiseLayer.unwrap(value4)));
 }
 function map_promise(promise, fn) {
   return promise.then(
-    (value3) => PromiseLayer.wrap(fn(PromiseLayer.unwrap(value3)))
+    (value4) => PromiseLayer.wrap(fn(PromiseLayer.unwrap(value4)))
   );
 }
 function rescue(promise, fn) {
@@ -4190,13 +4190,13 @@ function make_headers(headersList) {
   return headers;
 }
 async function read_text_body(response) {
-  let body;
+  let body2;
   try {
-    body = await response.body.text();
+    body2 = await response.body.text();
   } catch (error) {
     return new Error(new UnableToReadBody());
   }
-  return new Ok(response.withFields({ body }));
+  return new Ok(response.withFields({ body: body2 }));
 }
 
 // build/dev/javascript/gleam_fetch/gleam/fetch.mjs
@@ -4297,19 +4297,19 @@ function get(url, expect) {
 function response_to_result(response) {
   if (response instanceof Response && (200 <= response.status && response.status <= 299)) {
     let status = response.status;
-    let body = response.body;
-    return new Ok(body);
+    let body2 = response.body;
+    return new Ok(body2);
   } else if (response instanceof Response && response.status === 401) {
     return new Error(new Unauthorized());
   } else if (response instanceof Response && response.status === 404) {
     return new Error(new NotFound());
   } else if (response instanceof Response && response.status === 500) {
-    let body = response.body;
-    return new Error(new InternalServerError(body));
+    let body2 = response.body;
+    return new Error(new InternalServerError(body2));
   } else {
-    let code = response.status;
-    let body = response.body;
-    return new Error(new OtherError(code, body));
+    let code2 = response.status;
+    let body2 = response.body;
+    return new Error(new OtherError(code2, body2));
   }
 }
 function expect_json(decoder, to_msg) {
@@ -4319,8 +4319,8 @@ function expect_json(decoder, to_msg) {
       let _pipe$1 = then$(_pipe, response_to_result);
       let _pipe$2 = then$(
         _pipe$1,
-        (body) => {
-          let $ = parse(body, decoder);
+        (body2) => {
+          let $ = parse(body2, decoder);
           if ($.isOk()) {
             let json = $[0];
             return new Ok(json);
@@ -4333,6 +4333,143 @@ function expect_json(decoder, to_msg) {
       return to_msg(_pipe$2);
     }
   );
+}
+
+// build/dev/javascript/plinth/window_ffi.mjs
+function self() {
+  return globalThis;
+}
+function alert(message) {
+  window.alert(message);
+}
+function prompt(message, defaultValue) {
+  let text2 = window.prompt(message, defaultValue);
+  if (text2 !== null) {
+    return new Ok(text2);
+  } else {
+    return new Error();
+  }
+}
+function addEventListener3(type, listener) {
+  return window.addEventListener(type, listener);
+}
+function document2(window2) {
+  return window2.document;
+}
+async function requestWakeLock() {
+  try {
+    return new Ok(await window.navigator.wakeLock.request("screen"));
+  } catch (error) {
+    return new Error(error.toString());
+  }
+}
+function location() {
+  return window.location.href;
+}
+function locationOf(w) {
+  try {
+    return new Ok(w.location.href);
+  } catch (error) {
+    return new Error(error.toString());
+  }
+}
+function setLocation(w, url) {
+  w.location.href = url;
+}
+function origin() {
+  return window.location.origin;
+}
+function pathname() {
+  return window.location.pathname;
+}
+function reload() {
+  return window.location.reload();
+}
+function reloadOf(w) {
+  return w.location.reload();
+}
+function focus2(w) {
+  return w.focus();
+}
+function getHash2() {
+  const hash = window.location.hash;
+  if (hash == "") {
+    return new Error();
+  }
+  return new Ok(decodeURIComponent(hash.slice(1)));
+}
+function getSearch() {
+  const search = window.location.search;
+  if (search == "") {
+    return new Error();
+  }
+  return new Ok(decodeURIComponent(search.slice(1)));
+}
+function innerHeight(w) {
+  return w.innerHeight;
+}
+function innerWidth(w) {
+  return w.innerWidth;
+}
+function outerHeight(w) {
+  return w.outerHeight;
+}
+function outerWidth(w) {
+  return w.outerWidth;
+}
+function screenX(w) {
+  return w.screenX;
+}
+function screenY(w) {
+  return w.screenY;
+}
+function screenTop(w) {
+  return w.screenTop;
+}
+function screenLeft(w) {
+  return w.screenLeft;
+}
+function scrollX(w) {
+  return w.scrollX;
+}
+function scrollY(w) {
+  return w.scrollY;
+}
+function open(url, target3, features) {
+  try {
+    return new Ok(window.open(url, target3, features));
+  } catch (error) {
+    return new Error(error.toString());
+  }
+}
+function close(w) {
+  w.close();
+}
+function closed(w) {
+  return w.closed;
+}
+function queueMicrotask(callback) {
+  return window.queueMicrotask(callback);
+}
+function requestAnimationFrame(callback) {
+  return window.requestAnimationFrame(callback);
+}
+function cancelAnimationFrame(callback) {
+  return window.cancelAnimationFrame(callback);
+}
+function eval_(string) {
+  try {
+    return new Ok(eval(string));
+  } catch (error) {
+    return new Error(error.toString());
+  }
+}
+async function import_(string6) {
+  try {
+    return new Ok(await import(string6));
+  } catch (error) {
+    return new Error(error.toString());
+  }
 }
 
 // build/dev/javascript/plinth/global_ffi.mjs
@@ -4407,15 +4544,15 @@ var Tick = class extends CustomType {
 function deployment_decoder() {
   return field2(
     "service_name",
-    string3,
+    string4,
     (service_name) => {
       return field2(
         "keys",
-        string3,
+        string4,
         (keys2) => {
           return field2(
             "status",
-            string3,
+            string4,
             (status) => {
               return field2(
                 "running_count",
@@ -4462,15 +4599,15 @@ function deployment_decoder() {
 function deployment_error_decoder() {
   return field2(
     "service_name",
-    string3,
+    string4,
     (service_name) => {
       return field2(
         "keys",
-        string3,
+        string4,
         (keys2) => {
           return field2(
             "error",
-            string3,
+            string4,
             (error) => {
               return success(
                 new DeploymentError(service_name, keys2, error)
@@ -4506,7 +4643,7 @@ function fetch_deps() {
       return new ResultsFetched(var0);
     }
   );
-  return get("http://127.0.0.1:4500/api/deps", expect);
+  return get(location() + "api/deps", expect);
 }
 function schedule_next_tick(delay_seconds) {
   return from(
@@ -4762,9 +4899,9 @@ function on_click(msg) {
     return new Ok(msg);
   });
 }
-function value2(event2) {
+function value3(event2) {
   let _pipe = event2;
-  return field("target", field("value", string))(
+  return field("target", field("value", string2))(
     _pipe
   );
 }
@@ -4772,7 +4909,7 @@ function on_input(msg) {
   return on2(
     "input",
     (event2) => {
-      let _pipe = value2(event2);
+      let _pipe = value3(event2);
       return map2(_pipe, msg);
     }
   );
@@ -4809,9 +4946,9 @@ function http_error_to_string(error) {
   } else if (error instanceof NotFound) {
     return "not found";
   } else if (error instanceof OtherError) {
-    let code = error[0];
-    let body = error[1];
-    return "server returned " + to_string(code) + " code with body: " + body;
+    let code2 = error[0];
+    let body2 = error[1];
+    return "server returned " + to_string(code2) + " code with body: " + body2;
   } else {
     return "unauthorized";
   }
