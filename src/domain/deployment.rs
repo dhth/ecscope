@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, serde::Serialize)]
+#[derive(Debug, Clone, serde::Serialize, PartialEq, Eq)]
 pub struct DeploymentError {
     pub service_name: String,
     pub error: String,
@@ -23,6 +23,20 @@ Error       : {}"
     }
 }
 
+impl Ord for DeploymentError {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.service_name
+            .cmp(&other.service_name)
+            .then_with(|| self.keys.cmp(&other.keys))
+    }
+}
+
+impl PartialOrd for DeploymentError {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
 pub type DeploymentResult = Result<DeploymentDetails, DeploymentError>;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, serde::Serialize)]
@@ -36,6 +50,20 @@ pub struct DeploymentDetails {
     pub desired_count: i32,
     pub pending_count: i32,
     pub failed_count: i32,
+}
+
+impl Ord for DeploymentDetails {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.service_name
+            .cmp(&other.service_name)
+            .then_with(|| self.keys.cmp(&other.keys))
+    }
+}
+
+impl PartialOrd for DeploymentDetails {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl DeploymentDetails {

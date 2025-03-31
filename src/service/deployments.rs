@@ -52,6 +52,9 @@ pub async fn get_deployments(
         }
     }
 
+    deployments.sort();
+    errors.sort();
+
     Ok((deployments, errors))
 }
 
