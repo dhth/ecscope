@@ -20,16 +20,6 @@ jobs:
       - name: Add profile with ecscope on main
         run: /var/tmp/main/debug/ecscope profiles add prof1
       - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
-        with:
-          otp-version: "27.1.2"
-          gleam-version: "1.9.1"
-          rebar3-version: "3"
-      - name: Compile gleam to js
-        run: |
-          cd src/server/deployments/client
-          gleam deps download
-          gleam run -m lustre/dev build app
       - name: Build head
         run: cargo build --target-dir /var/tmp/head
       - name: Run ecscope on head

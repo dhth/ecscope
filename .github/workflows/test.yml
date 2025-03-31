@@ -14,14 +14,13 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Install elm
-        uses: ./.github/actions/install-elm
-      - name: Compile elm to js
-        uses: ./.github/actions/compile-elm
       - name: Run tests
         run: cargo test

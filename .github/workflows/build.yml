@@ -14,11 +14,21 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build
+        run: cargo build
+
+  build-gleam:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "27.1.2"
@@ -29,5 +39,9 @@ jobs:
           cd src/server/deployments/client
           gleam deps download
           gleam run -m lustre/dev build app
-      - name: Build
-        run: cargo build
+      - name: Ensure compiled js files haven't changed
+        run: |
+          if git --no-pager diff --name-only | grep -q ".*.mjs"; then
+            echo "compiled js files have changed; compile them again"
+            git --no-pager diff --name-only
+            exit 1
