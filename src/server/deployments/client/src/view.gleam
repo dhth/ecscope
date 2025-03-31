@@ -12,19 +12,16 @@ import types.{type Msg}
 import utils
 
 pub fn view(model: Model) -> element.Element(Msg) {
-  html.div(
-    [attribute.class("w-2/3 mx-auto bg-[#282828] text-[#ebdbb2] mt-10")],
-    [
+  html.div([attribute.class("w-2/3 mx-auto bg-[#282828] text-[#ebdbb2] mt-8")], [
+    html.div([], [
       html.div([], [
-        html.div([], [
-          model_debug_div(model),
-          heading(model.fetching),
-          fetch_controls_div(model),
-          main_div(model),
-        ]),
+        model_debug_div(model),
+        heading(model.fetching),
+        fetch_controls_div(model),
+        main_div(model),
       ]),
-    ],
-  )
+    ]),
+  ])
 }
 
 fn model_debug_div(model: Model) -> element.Element(Msg) {
@@ -48,7 +45,7 @@ fn heading(fetching: Bool) -> element.Element(Msg) {
     False -> "ecscope"
   }
 
-  html.h1([attribute.class("text-3xl font-bold mb-6")], [
+  html.h1([attribute.class("text-3xl font-bold mb-4")], [
     html.a(
       [
         attribute.href("https://github.com/dhth/ecscope"),
@@ -82,12 +79,12 @@ fn fetch_controls_div(model: Model) -> element.Element(Msg) {
         ),
         html.input([
           attribute.class(
-            "h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] pl-3",
+            "h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] pl-5 pr-2",
           ),
           attribute.id("auto-refresh-interval"),
           attribute.type_("number"),
           attribute.min("5"),
-          attribute.max("300"),
+          attribute.max("60"),
           attribute.value(int.to_string(model.reload_seconds)),
           attribute.disabled(model.auto_refresh),
           event.on_input(types.AutoRefreshScheduleChanged),
@@ -114,11 +111,13 @@ fn fetch_controls_div(model: Model) -> element.Element(Msg) {
 }
 
 fn main_div(model: Model) -> element.Element(Msg) {
-  case model.status {
-    types.Errored(error) -> http_error_div(error)
-    types.Loaded(results) -> results_div(results)
-    types.Loading -> loading_div()
-  }
+  html.div([attribute.class("mb-8")], [
+    case model.status {
+      types.Errored(error) -> http_error_div(error)
+      types.Loaded(results) -> results_div(results)
+      types.Loading -> loading_div()
+    },
+  ])
 }
 
 fn http_error_div(error: lustre_http.HttpError) -> element.Element(Msg) {

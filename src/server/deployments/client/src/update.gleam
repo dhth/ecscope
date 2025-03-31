@@ -11,7 +11,7 @@ pub fn update(model: Model, msg: Msg) -> #(Model, effect.Effect(Msg)) {
         Error(_) -> #(model, effect.none())
         Ok(seconds) ->
           case seconds {
-            s if s >= 5 && s <= 300 -> #(
+            s if s >= 5 && s <= 60 -> #(
               Model(..model, reload_seconds: s),
               effect.none(),
             )

@@ -4693,7 +4693,7 @@ function update(model, msg) {
       return [model, none()];
     } else {
       let seconds = $[0];
-      if (seconds >= 5 && seconds <= 300) {
+      if (seconds >= 5 && seconds <= 60) {
         let s = seconds;
         return [
           (() => {
@@ -5162,7 +5162,7 @@ function heading(fetching) {
     }
   })();
   return h1(
-    toList([class$("text-3xl font-bold mb-6")]),
+    toList([class$("text-3xl font-bold mb-4")]),
     toList([
       a(
         toList([
@@ -5208,12 +5208,12 @@ function fetch_controls_div(model) {
           input(
             toList([
               class$(
-                "h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] pl-3"
+                "h-8 text-center text-[#ebdbb2] bg-[#3c3836] focus:ring-[#fabd2f] pl-5 pr-2"
               ),
               id("auto-refresh-interval"),
               type_("number"),
               min("5"),
-              max("300"),
+              max("60"),
               value(to_string(model.reload_seconds)),
               disabled(model.auto_refresh),
               on_input(
@@ -5499,22 +5499,27 @@ function results_div(results) {
   return div(toList([id("deployment-results")]), results$1);
 }
 function main_div(model) {
-  let $ = model.status;
-  if ($ instanceof Errored) {
-    let error = $[0];
-    return http_error_div(error);
-  } else if ($ instanceof Loaded) {
-    let results = $[0];
-    return results_div(results);
-  } else {
-    return loading_div();
-  }
+  return div(
+    toList([class$("mb-8")]),
+    toList([
+      (() => {
+        let $ = model.status;
+        if ($ instanceof Errored) {
+          let error = $[0];
+          return http_error_div(error);
+        } else if ($ instanceof Loaded) {
+          let results = $[0];
+          return results_div(results);
+        } else {
+          return loading_div();
+        }
+      })()
+    ])
+  );
 }
 function view(model) {
   return div(
-    toList([
-      class$("w-2/3 mx-auto bg-[#282828] text-[#ebdbb2] mt-10")
-    ]),
+    toList([class$("w-2/3 mx-auto bg-[#282828] text-[#ebdbb2] mt-8")]),
     toList([
       div(
         toList([]),
