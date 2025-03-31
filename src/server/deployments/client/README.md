@@ -3,13 +3,15 @@
 Local Development
 ---
 
-```sh
-# install gleam
-gleam deps download
+Prequisites
 
+- gleam
+
+```sh
 # start local development server
 # from project root
 cargo run -- deps <PROFILE> -m web
+
 cd src/server/deployments/client
 # replace window.location() in ./src/effects.gleam with http://127.0.0.1:<PORT>
 gleam run -m lustre/dev start
