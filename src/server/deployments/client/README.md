@@ -1,24 +1,28 @@
-# deps
+# Deployments Web UI
 
-[![Package Version](https://img.shields.io/hexpm/v/deps)](https://hex.pm/packages/deps)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/deps/)
-
-```sh
-gleam add deps@1
-```
-```gleam
-import deps
-
-pub fn main() {
-  // TODO: An example of the project in use
-}
-```
-
-Further documentation can be found at <https://hexdocs.pm/deps>.
-
-## Development
+Local Development
+---
 
 ```sh
-gleam run   # Run the project
-gleam test  # Run the tests
+# install gleam
+gleam deps download
+
+# start local development server
+# from project root
+cargo run -- deps <PROFILE> -m web
+cd src/server/deployments/client
+# replace window.location() in ./src/effects.gleam with http://127.0.0.1:<PORT>
+gleam run -m lustre/dev start
+```
+
+Before committing code
+---
+
+```sh
+# ensure local changes in src/server/deployments/client/src/effects.gleam are
+# reverted
+cd src/server/deployments/client
+
+# compile app to js code
+gleam run -m lustre/dev build app
 ```
