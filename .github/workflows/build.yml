@@ -44,4 +44,5 @@ jobs:
           if git --no-pager diff --name-only | grep -q ".*.mjs"; then
             echo "compiled js files have changed; compile them again"
             git --no-pager diff --name-only
-            exit 1
+            false
+          fi

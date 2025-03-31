@@ -24,5 +24,3 @@ install-updater = false
 post-announce-jobs = ["./publish-crates"]
 # Whether to enable GitHub Attestations
 github-attestations = true
-# This setting determines to what extent cargo-dist runs the release CI on pull-requests
-pr-run-mode = "upload"
