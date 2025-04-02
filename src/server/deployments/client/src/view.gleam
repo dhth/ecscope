@@ -249,10 +249,9 @@ fn service_name_table_data(deployment: types.Deployment) -> element.Element(Msg)
       ])
 
     _ ->
-      html.td(
-        [attribute.class("font-semibold text-[" <> service_color <> "]")],
-        [element.text(deployment.service_name)],
-      )
+      html.td([attribute.class("font-semibold " <> service_color)], [
+        element.text(deployment.service_name),
+      ])
   }
 }
 

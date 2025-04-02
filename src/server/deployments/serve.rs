@@ -20,6 +20,7 @@ const ENV_VAR_PORT: &str = "ECSCOPE_PORT";
 const ROOT_HTML: &str = include_str!("client/index.html");
 const DEPS_JS: &str = include_str!("client/priv/static/deps.mjs");
 const DEPS_CSS: &str = include_str!("client/priv/static/deps.css");
+const DEPS_CUSTOM_CSS: &str = include_str!("client/priv/static/custom.css");
 const DEPS_FAVICON: &[u8] = include_bytes!("client/priv/static/favicon.png");
 
 #[derive(serde::Serialize)]
@@ -70,6 +71,7 @@ pub async fn serve_deployments(
         .route("/", get(move || root_get(env)))
         .route("/priv/static/deps.mjs", get(move || js_get(env)))
         .route("/priv/static/deps.css", get(move || css_get(env)))
+        .route("/priv/static/custom.css", get(move || css_custom_get(env)))
         .route("/priv/static/favicon.png", get(favicon_get))
         .route("/dev/api/deps", get(fake_deployments_get))
         .route(
@@ -154,6 +156,23 @@ async fn css_get(env: Environment) -> impl IntoResponse {
                 .unwrap()
         }
         Environment::Prod => DEPS_CSS.to_string(),
+    };
+    (headers, css)
+}
+
+async fn css_custom_get(env: Environment) -> impl IntoResponse {
+    let mut headers = HeaderMap::new();
+    #[allow(clippy::unwrap_used)]
+    headers.insert("Content-Type", "text/css".parse().unwrap());
+    let css = match env {
+        Environment::Dev =>
+        {
+            #[allow(clippy::unwrap_used)]
+            tokio::fs::read_to_string("src/server/deployments/client/priv/static/custom.css")
+                .await
+                .unwrap()
+        }
+        Environment::Prod => DEPS_CUSTOM_CSS.to_string(),
     };
     (headers, css)
 }

@@ -1164,15 +1164,15 @@ function graphemes_iterator(string6) {
   }
 }
 function pop_grapheme(string6) {
-  let first3;
+  let first2;
   const iterator = graphemes_iterator(string6);
   if (iterator) {
-    first3 = iterator.next().value?.segment;
+    first2 = iterator.next().value?.segment;
   } else {
-    first3 = string6.match(/./su)?.[0];
+    first2 = string6.match(/./su)?.[0];
   }
-  if (first3) {
-    return new Ok([first3, string6.slice(first3.length)]);
+  if (first2) {
+    return new Ok([first2, string6.slice(first2.length)]);
   } else {
     return new Error(Nil);
   }
@@ -1391,12 +1391,12 @@ function inspectString(str) {
 }
 function inspectDict(map7) {
   let body2 = "dict.from_list([";
-  let first3 = true;
+  let first2 = true;
   map7.forEach((value4, key2) => {
-    if (!first3)
+    if (!first2)
       body2 = body2 + ", ";
     body2 = body2 + "#(" + inspect(key2) + ", " + inspect(value4) + ")";
-    first3 = false;
+    first2 = false;
   });
   return body2 + "])";
 }
@@ -1462,10 +1462,10 @@ function reverse_and_concat(loop$remaining, loop$accumulator) {
     if (remaining.hasLength(0)) {
       return accumulator;
     } else {
-      let first3 = remaining.head;
+      let first2 = remaining.head;
       let rest = remaining.tail;
       loop$remaining = rest;
-      loop$accumulator = prepend(first3, accumulator);
+      loop$accumulator = prepend(first2, accumulator);
     }
   }
 }
@@ -1488,22 +1488,6 @@ function keys(dict2) {
 }
 
 // build/dev/javascript/gleam_stdlib/gleam/list.mjs
-function length_loop(loop$list, loop$count) {
-  while (true) {
-    let list3 = loop$list;
-    let count = loop$count;
-    if (list3.atLeastLength(1)) {
-      let list$1 = list3.tail;
-      loop$list = list$1;
-      loop$count = count + 1;
-    } else {
-      return count;
-    }
-  }
-}
-function length(list3) {
-  return length_loop(list3, 0);
-}
 function reverse_and_prepend(loop$prefix, loop$suffix) {
   while (true) {
     let prefix = loop$prefix;
@@ -1523,14 +1507,6 @@ function reverse(list3) {
 }
 function is_empty(list3) {
   return isEqual(list3, toList([]));
-}
-function first(list3) {
-  if (list3.hasLength(0)) {
-    return new Error(void 0);
-  } else {
-    let first$1 = list3.head;
-    return new Ok(first$1);
-  }
 }
 function map_loop(loop$list, loop$fun, loop$acc) {
   while (true) {
@@ -1553,20 +1529,20 @@ function map(list3, fun) {
 }
 function append_loop(loop$first, loop$second) {
   while (true) {
-    let first3 = loop$first;
+    let first2 = loop$first;
     let second = loop$second;
-    if (first3.hasLength(0)) {
+    if (first2.hasLength(0)) {
       return second;
     } else {
-      let first$1 = first3.head;
-      let rest$1 = first3.tail;
+      let first$1 = first2.head;
+      let rest$1 = first2.tail;
       loop$first = rest$1;
       loop$second = prepend(first$1, second);
     }
   }
 }
-function append(first3, second) {
-  return append_loop(reverse(first3), second);
+function append(first2, second) {
+  return append_loop(reverse(first2), second);
 }
 function fold(loop$list, loop$initial, loop$fun) {
   while (true) {
@@ -1605,30 +1581,6 @@ function index_fold_loop(loop$over, loop$acc, loop$with, loop$index) {
 function index_fold(list3, initial, fun) {
   return index_fold_loop(list3, initial, fun, 0);
 }
-function split_loop(loop$list, loop$n, loop$taken) {
-  while (true) {
-    let list3 = loop$list;
-    let n = loop$n;
-    let taken = loop$taken;
-    let $ = n <= 0;
-    if ($) {
-      return [reverse(taken), list3];
-    } else {
-      if (list3.hasLength(0)) {
-        return [reverse(taken), toList([])];
-      } else {
-        let first$1 = list3.head;
-        let rest$1 = list3.tail;
-        loop$list = rest$1;
-        loop$n = n - 1;
-        loop$taken = prepend(first$1, taken);
-      }
-    }
-  }
-}
-function split2(list3, index5) {
-  return split_loop(list3, index5, toList([]));
-}
 
 // build/dev/javascript/gleam_stdlib/gleam/string.mjs
 function concat2(strings) {
@@ -1655,7 +1607,7 @@ function drop_start(loop$string, loop$num_graphemes) {
     }
   }
 }
-function split3(x, substring) {
+function split2(x, substring) {
   if (substring === "") {
     return graphemes(x);
   } else {
@@ -1926,10 +1878,10 @@ function run_decoders(loop$data, loop$failure, loop$decoders) {
     }
   }
 }
-function one_of(first3, alternatives) {
+function one_of(first2, alternatives) {
   return new Decoder(
     (dynamic_data) => {
-      let $ = first3.function(dynamic_data);
+      let $ = first2.function(dynamic_data);
       let layer = $;
       let errors = $[1];
       if (errors.hasLength(0)) {
@@ -4960,178 +4912,15 @@ function simple_hash(input2) {
     return a2 * 31 + b;
   });
 }
-var color_pool = /* @__PURE__ */ toList([
-  "#fd780b",
-  "#a882a7",
-  "#b798f0",
-  "#59d412",
-  "#7bcaff",
-  "#ffb472",
-  "#00ce48",
-  "#1edacd",
-  "#a0d845",
-  "#a681fb",
-  "#f081de",
-  "#63bd8f",
-  "#d3cdc5",
-  "#64d97f",
-  "#acaa5e",
-  "#90e1ef",
-  "#ddd601",
-  "#4896ef",
-  "#e98658",
-  "#b5d092",
-  "#9fb9f0",
-  "#ff6682",
-  "#149ccd",
-  "#59c435",
-  "#83a598",
-  "#f27abe",
-  "#b9d9cf",
-  "#88b500",
-  "#faca7d",
-  "#f344ff",
-  "#f19597",
-  "#aab08a",
-  "#fabd2f",
-  "#0abe88",
-  "#c9b094",
-  "#a6b92b",
-  "#b4c800",
-  "#00c3f9",
-  "#d89e9d",
-  "#48cae4",
-  "#00b700",
-  "#4dcfdb",
-  "#e96462",
-  "#7b8ad5",
-  "#00b499",
-  "#fe9103",
-  "#04eb4d",
-  "#daa402",
-  "#5cab95",
-  "#ce8cf7",
-  "#7db839",
-  "#d3869a",
-  "#f0947b",
-  "#a7e0c2",
-  "#ff4ded",
-  "#b5e48c",
-  "#ff4c8b",
-  "#ff9743",
-  "#ffc6ff",
-  "#de9644",
-  "#8fbc96",
-  "#b29807",
-  "#ffc20c",
-  "#be876e",
-  "#ceb4c3",
-  "#ee91b6",
-  "#a8b64c",
-  "#fe77a4",
-  "#7a9879",
-  "#febcac",
-  "#add562",
-  "#a8d906",
-  "#b4d4fb",
-  "#dcad50",
-  "#ff5405",
-  "#e47cfb",
-  "#f646c1",
-  "#c6a267",
-  "#ada7ff",
-  "#d4925c",
-  "#8187dc",
-  "#6ac1db",
-  "#5aaaff",
-  "#5ddb63",
-  "#94bc63",
-  "#c7921f",
-  "#83b87a",
-  "#e2ac85",
-  "#ffb0c2",
-  "#99bbcd",
-  "#c57fbf",
-  "#fc5260",
-  "#6fbd63",
-  "#4daa67",
-  "#00d977",
-  "#0798ff",
-  "#07b1fa",
-  "#cec48b",
-  "#c3a4e1",
-  "#849843",
-  "#bbd1ff",
-  "#df748b",
-  "#9ae089",
-  "#a8a9a3",
-  "#89d967",
-  "#e7c727",
-  "#8498fb",
-  "#829b60",
-  "#62a6ae",
-  "#dc8b00",
-  "#6ed999",
-  "#e6a5f4",
-  "#9cdea5",
-  "#aba3ca",
-  "#4ba539",
-  "#c7b648",
-  "#949aab",
-  "#9c9360",
-  "#05b64c",
-  "#ffb13c",
-  "#b8bb26",
-  "#8de107",
-  "#6fd0bd",
-  "#d1cc74",
-  "#ffb5a2",
-  "#03d7b3",
-  "#00db04",
-  "#90b4a6",
-  "#fbcf56",
-  "#bbb206",
-  "#51a100",
-  "#ff803b",
-  "#ff6334",
-  "#af9084",
-  "#00d990",
-  "#aaaffc",
-  "#ae8c99",
-  "#89cbce",
-  "#19b7b2",
-  "#71c200",
-  "#629fdb",
-  "#6da2c6",
-  "#12b667",
-  "#fc69e6",
-  "#01aac0",
-  "#8ce852",
-  "#c97df9",
-  "#d2c8f2",
-  "#d67717",
-  "#dfa5ca",
-  "#00ddff",
-  "#6e9f3a"
-]);
+var num_custom_colors = 45;
 function color_for_string(input2) {
   let hash = simple_hash(input2);
   let index5 = (() => {
     let _pipe = hash;
-    let _pipe$1 = remainder(_pipe, length(color_pool));
+    let _pipe$1 = remainder(_pipe, num_custom_colors);
     return unwrap2(_pipe$1, 0);
   })();
-  let $ = split2(color_pool, index5);
-  {
-    let colors = $[1];
-    let $1 = first(colors);
-    if (!$1.isOk()) {
-      return "#ebdbb2";
-    } else {
-      let color = $1[0];
-      return color;
-    }
-  }
+  return "text-color" + to_string(index5);
 }
 
 // build/dev/javascript/deps/view.mjs
@@ -5303,7 +5092,7 @@ function service_name_table_data(deployment) {
     );
   } else {
     return td(
-      toList([class$("font-semibold text-[" + service_color + "]")]),
+      toList([class$("font-semibold " + service_color)]),
       toList([text(deployment.service_name)])
     );
   }
@@ -5424,7 +5213,7 @@ function error_table_service_name_td(error) {
 }
 function error_with_new_lines(text2) {
   let _pipe = text2;
-  let _pipe$1 = split3(_pipe, "\n");
+  let _pipe$1 = split2(_pipe, "\n");
   return map(
     _pipe$1,
     (s) => {
