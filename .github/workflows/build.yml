@@ -39,10 +39,10 @@ jobs:
           cd src/server/deployments/client
           gleam deps download
           gleam run -m lustre/dev build app
-      - name: Ensure compiled js files haven't changed
+      - name: Ensure compiled files haven't changed
         run: |
-          if git --no-pager diff --name-only | grep -q ".*.mjs"; then
-            echo "compiled js files have changed; compile them again"
+          if git --no-pager diff --name-only | grep -q "priv/static"; then
+            echo "compiled files have changed; compile them again"
             git --no-pager diff --name-only
             false
           fi
