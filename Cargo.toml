@@ -43,7 +43,7 @@ toml = {version = "0.8.20", features = ["parse"] }
 tower-http = { version = "0.6.2", features = ["cors", "fs"] }
 
 [dev-dependencies]
-assert_cmd = "2.0.16"
+assert_cmd = "2.0.17"
 pretty_assertions = "1.4.1"
 
 [lints.clippy]
