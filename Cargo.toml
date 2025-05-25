@@ -40,7 +40,7 @@ tempfile = "3.19.1"
 thiserror = "2.0.12"
 tokio = { version = "1.45.1", features = ["full"] }
 toml = {version = "0.8.22", features = ["parse"] }
-tower-http = { version = "0.6.2", features = ["cors", "fs"] }
+tower-http = { version = "0.6.4", features = ["cors", "fs"] }
 
 [dev-dependencies]
 assert_cmd = "2.0.17"
