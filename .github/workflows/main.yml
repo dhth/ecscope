@@ -1,0 +1,184 @@
+name: main
+
+on:
+  push:
+    branches:
+      - 'main'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      rust: ${{ steps.filter.outputs.rust }}
+      gleam: ${{ steps.filter.outputs.gleam }}
+      workflows: ${{ steps.filter.outputs.workflows }}
+      yml: ${{ steps.filter.outputs.yml }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            gleam:
+              - "src/server/deployments/client/**"
+              - ".github/actions/**/*.yml"
+              - ".github/workflows/main.yml"
+            rust:
+              - "src/**"
+              - "**/*.rs"
+              - Cargo.*
+              - clippy.toml
+              - dist-workspace.toml
+              - rust-toolchain.toml
+              - ".github/actions/**/*.yml"
+              - ".github/workflows/main.yml"
+            workflows:
+              - ".github/**/*.yml"
+            yml:
+              - "**.yml"
+              - "**.yaml"
+
+  lint-rust:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: clippy, rustfmt
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+      - name: Lint
+        run: cargo clippy
+
+  lint-gleam:
+    needs: changes
+    if: ${{ needs.changes.outputs.gleam == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam format src --check
+
+  build-rust:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Build
+        run: cargo build
+
+  build-gleam:
+    needs: changes
+    if: ${{ needs.changes.outputs.gleam == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Compile gleam to js
+        run: |
+          cd src/server/deployments/client
+          gleam deps download
+          gleam run -m lustre/dev build app
+      - name: Ensure compiled files haven't changed
+        run: |
+          if git --no-pager diff --name-only | grep -q "priv/static"; then
+            echo "compiled files have changed; compile them again"
+            git --no-pager diff --name-only
+            false
+          fi
+
+  test-rust:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Test
+        run: cargo test
+
+  test-gleam:
+    needs: changes
+    if: ${{ needs.changes.outputs.gleam == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: "27.1.2"
+          gleam-version: "1.9.1"
+          rebar3-version: "3"
+      - name: Run tests
+        run: |
+          cd src/server/deployments/client
+          gleam test
+
+  lint-yaml:
+    needs: changes
+    if: ${{ needs.changes.outputs.yml == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: dhth/composite-actions/.github/actions/lint-yaml@main
+
+  lint-workflows:
+    needs: changes
+    if: ${{ needs.changes.outputs.workflows == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: dhth/composite-actions/.github/actions/lint-actions@main
+
+  back-compat:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - run: git checkout HEAD~1
+      - name: Build last commit
+        run: cargo build --target-dir /var/tmp/last
+      - name: Add profile with ecscope on last commit
+        run: /var/tmp/last/debug/ecscope profiles add prof1
+      - run: git checkout main
+      - name: Build head
+        run: cargo build --target-dir /var/tmp/head
+      - name: Run ecscope on head
+        run: /var/tmp/head/debug/ecscope monitor prof1 --debug
