@@ -26,7 +26,7 @@ jobs:
             gleam:
               - "src/server/deployments/client/**"
               - ".github/actions/**/*.yml"
-              - ".github/workflows/pr.yml"
+              - ".github/workflows/main.yml"
             rust:
               - "src/**"
               - "**/*.rs"
@@ -35,7 +35,7 @@ jobs:
               - dist-workspace.toml
               - rust-toolchain.toml
               - ".github/actions/**/*.yml"
-              - ".github/workflows/pr.yml"
+              - ".github/workflows/main.yml"
             workflows:
               - ".github/**/*.yml"
             yml:
@@ -123,7 +123,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - name: Build
+      - name: Test
         run: cargo test
 
   test-gleam:
@@ -159,21 +159,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - uses: dhth/composite-actions/.github/actions/lint-actions@main
-
-  dry-run:
-    needs: changes
-    if: ${{ github.actor != 'dependabot[bot]' && needs.changes.outputs.rust == 'true' }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Dry run
-        uses: ./.github/actions/dry-run
-        with:
-          mrj_app_id: ${{ secrets.MRJ_APP_ID }}
-          mrj_app_private_key: ${{ secrets.MRJ_APP_PRIVATE_KEY }}
 
   back-compat:
     needs: changes
