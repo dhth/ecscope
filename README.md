@@ -1,7 +1,7 @@
 <p align="center">
   <h1 align="center">ecscope</h1>
   <p align="center">
-    <a href="https://github.com/dhth/ecscope/actions/workflows/build.yml"><img alt="GitHub release" src="https://img.shields.io/github/actions/workflow/status/dhth/ecscope/build.yml?style=flat-square"></a>
+    <a href="https://github.com/dhth/ecscope/actions/workflows/main.yml"><img alt="GitHub release" src="https://img.shields.io/github/actions/workflow/status/dhth/ecscope/main.yml?style=flat-square"></a>
     <a href="https://crates.io/crates/ecscope"><img alt="GitHub release" src="https://img.shields.io/crates/v/ecscope?style=flat-square"></a>
     <a href="https://github.com/dhth/ecscope/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/release/dhth/ecscope.svg?style=flat-square"></a>
     <a href="https://github.com/dhth/ecscope/releases"><img alt="Commits since latest release" src="https://img.shields.io/github/commits-since/dhth/ecscope/latest?style=flat-square"></a>
