@@ -15,6 +15,7 @@ jobs:
       contents: read
     outputs:
       rust: ${{ steps.filter.outputs.rust }}
+      rust-deps: ${{ steps.filter.outputs.rust-deps }}
       gleam: ${{ steps.filter.outputs.gleam }}
       workflows: ${{ steps.filter.outputs.workflows }}
       yml: ${{ steps.filter.outputs.yml }}
@@ -37,6 +38,11 @@ jobs:
               - dist-workspace.toml
               - rust-toolchain.toml
               - ".github/actions/**/*.yml"
+              - ".github/workflows/main.yml"
+            rust-deps:
+              - "Cargo.toml"
+              - "Cargo.lock"
+              - "deny.toml"
               - ".github/workflows/main.yml"
             workflows:
               - ".github/**/*.yml"
@@ -182,3 +188,18 @@ jobs:
         run: cargo build --target-dir /var/tmp/head
       - name: Run ecscope on head
         run: /var/tmp/head/debug/ecscope monitor prof1 --debug
+
+  audit:
+    needs: changes
+    if: ${{ needs.changes.outputs.rust-deps == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Install cargo-deny
+        uses: jaxxstorm/action-install-gh-release@6096f2a2bbfee498ced520b6922ac2c06e990ed2 # v2.1.0
+        with:
+          repo: EmbarkStudios/cargo-deny
+      - name: cargo deny
+        run: cargo deny check
