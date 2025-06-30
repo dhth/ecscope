@@ -19,7 +19,7 @@ impl std::fmt::Display for OutputFormat {
             OutputFormat::Delimited => "delimited",
         };
 
-        write!(f, "{}", value)?;
+        write!(f, "{value}")?;
 
         Ok(())
     }
@@ -68,7 +68,7 @@ impl std::fmt::Display for OutputMode {
             OutputMode::Web => "web",
         };
 
-        write!(f, "{}", value)?;
+        write!(f, "{value}")?;
 
         Ok(())
     }

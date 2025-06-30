@@ -97,7 +97,7 @@ pub async fn serve_deployments(
         },
     }?;
 
-    let address = format!("127.0.0.1:{}", port);
+    let address = format!("127.0.0.1:{port}");
 
     let listener = tokio::net::TcpListener::bind(&address)
         .await
@@ -228,7 +228,7 @@ async fn fake_deployments_get() -> Result<GetDeploymentsResponse, ApiError> {
     let num_services = rng.random_range(1..=5);
 
     let services = (0..num_services)
-        .map(|i| format!("service-{}", i))
+        .map(|i| format!("service-{i}"))
         .collect::<Vec<_>>();
 
     let mut deployments = vec![];
@@ -255,9 +255,9 @@ async fn fake_deployments_get() -> Result<GetDeploymentsResponse, ApiError> {
     let num_errors = rng.random_range(1..=5);
     let errors = (0..num_errors)
         .map(|i| DeploymentError {
-            service_name: format!("service-{}", i),
+            service_name: format!("service-{i}"),
             error: "couldn't get access token\nLine 2\nLine 3\nLine 4".to_string(),
-            cluster_arn: format!("cluster-{}", i),
+            cluster_arn: format!("cluster-{i}"),
             keys: "qa".to_string(),
         })
         .collect::<Vec<_>>();

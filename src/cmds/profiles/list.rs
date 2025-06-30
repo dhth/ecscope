@@ -53,7 +53,7 @@ pub fn list_profiles(config_dir: &Path) -> Result<(), ListProfilesError> {
         })
         .collect::<Vec<_>>()
         .join("\n");
-    println!("{}", output);
+    println!("{output}");
 
     Ok(())
 }

@@ -36,10 +36,7 @@ pub async fn get_deployments(
     let mut errors = Vec::new();
 
     for task in tasks {
-        match task
-            .await
-            .map_err(|e| format!("couldn't join task: {}", e))?
-        {
+        match task.await.map_err(|e| format!("couldn't join task: {e}"))? {
             Ok(results) => {
                 for result in results {
                     match result {
@@ -67,7 +64,7 @@ async fn deployments_for_cluster(
     let _permit = semaphore
         .acquire()
         .await
-        .map_err(|e| format!("couldn't acquire semaphore permit: {}", e))?;
+        .map_err(|e| format!("couldn't acquire semaphore permit: {e}"))?;
 
     let servs_result = client
         .describe_services()
@@ -119,7 +116,7 @@ async fn deployments_for_cluster(
             for service in &cluster.services {
                 results.push(Err(DeploymentError {
                     service_name: service.to_string(),
-                    error: format!("{:?}", error),
+                    error: format!("{error:?}"),
                     cluster_arn: cluster.arn.clone(),
                     keys: cluster.keys.join(","),
                 }));

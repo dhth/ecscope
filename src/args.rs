@@ -118,9 +118,8 @@ skip opening web results : {}
                 ProfilesCommand::Add { name } => format!(
                     r#"
 command           : Add Profile
-name              : {}
-"#,
-                    name
+name              : {name}
+"#
                 ),
                 ProfilesCommand::List => r#"
 command           : List Profiles
@@ -155,5 +154,5 @@ key filter          : {}
 }
 
 fn validate_filter_query(value: &str) -> Result<Regex, String> {
-    Regex::new(value).map_err(|e| format!("query \"{}\" is not valid regex: {}", value, e))
+    Regex::new(value).map_err(|e| format!("query \"{value}\" is not valid regex: {e}"))
 }
