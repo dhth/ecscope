@@ -109,7 +109,7 @@ fn render_status_line(model: &Model, frame: &mut Frame, rect: Rect) {
         status_bar_lines.push(Span::from(
             model
                 .last_active_pane
-                .map(|p| format!(" [{}]", p))
+                .map(|p| format!(" [{p}]"))
                 .unwrap_or(" -".to_string()),
         ));
         status_bar_lines.push(Span::from(format!(" -> [{}]", model.active_pane)));
@@ -131,10 +131,10 @@ fn render_status_line(model: &Model, frame: &mut Frame, rect: Rect) {
     if let Some(msg) = &model.user_message {
         let span = match msg {
             UserMessage::Info(m, _) => {
-                Span::styled(format!(" {}", m), Style::new().fg(INFO_MESSAGE_COLOR))
+                Span::styled(format!(" {m}"), Style::new().fg(INFO_MESSAGE_COLOR))
             }
             UserMessage::Error(m, _) => {
-                Span::styled(format!(" {}", m), Style::new().fg(ERROR_MESSAGE_COLOR))
+                Span::styled(format!(" {m}"), Style::new().fg(ERROR_MESSAGE_COLOR))
             }
         };
 

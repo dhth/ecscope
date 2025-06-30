@@ -43,7 +43,7 @@ pub async fn list_deployments(
             OutputFormat::Json => println!("{}", serde_json::to_string_pretty(&deployments)?),
             OutputFormat::Plain => {
                 for dep in deployments {
-                    println!("{}", dep);
+                    println!("{dep}");
                 }
             }
         }
@@ -60,9 +60,8 @@ errors
 
     for error in errors {
         eprintln!(
-            "{}
----",
-            error
+            "{error}
+---"
         );
     }
 

@@ -44,8 +44,8 @@ impl ExpectedSuccess for std::process::Output {
 
         let stderr = std::str::from_utf8(&self.stderr).expect("invalid utf-8 stderr");
         match context {
-            Some(c) => println!("{} stderr: \n{}", c, stderr),
-            None => println!("stderr: \n{}", stderr),
+            Some(c) => println!("{c} stderr: \n{stderr}"),
+            None => println!("stderr: \n{stderr}"),
         }
     }
 }
@@ -63,8 +63,8 @@ impl ExpectedFailure for std::process::Output {
 
         let stdout = std::str::from_utf8(&self.stdout).expect("invalid utf-8 stdout");
         match context {
-            Some(c) => println!("{} stdout: \n{}", c, stdout),
-            None => println!("stdout: \n{}", stdout),
+            Some(c) => println!("{c} stdout: \n{stdout}"),
+            None => println!("stdout: \n{stdout}"),
         }
     }
 }

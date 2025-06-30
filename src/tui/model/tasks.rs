@@ -39,7 +39,7 @@ impl From<&TaskItem> for ListItem<'_> {
                 .task
                 .task_arn()
                 .and_then(|arn| arn.split("/").last())
-                .map(|id| format!("{}{}", id, pending_marker))
+                .map(|id| format!("{id}{pending_marker}"))
                 .unwrap_or(UNKNOWN_VALUE.to_string()),
         );
 

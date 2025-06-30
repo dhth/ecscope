@@ -43,7 +43,7 @@ impl From<&ContainerItem> for ListItem<'_> {
             value
                 .container
                 .name()
-                .map(|n| format!("{}{}", n, pending_marker))
+                .map(|n| format!("{n}{pending_marker}"))
                 .unwrap_or(UNKNOWN_VALUE.to_string()),
         );
         ListItem::new(line)

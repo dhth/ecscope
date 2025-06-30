@@ -12,7 +12,7 @@ impl TryFrom<&str> for Profile {
         let re = Regex::new(TAG_REGEX_STR).expect("profile regex is invalid");
 
         if !re.is_match(value) {
-            return Err(format!("valid regex: {}", TAG_REGEX_STR));
+            return Err(format!("valid regex: {TAG_REGEX_STR}"));
         }
 
         Ok(Self(value.to_string()))

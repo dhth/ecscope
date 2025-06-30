@@ -105,7 +105,7 @@ async fn handle_get_services(
             for service in &cluster.services {
                 si.push(ServiceResult::Err(ServiceError {
                     service_name: service.to_string(),
-                    error: format!("{:?}", error),
+                    error: format!("{error:?}"),
                     cluster_keys: cluster.keys.clone(),
                 }));
             }
@@ -206,7 +206,7 @@ async fn handle_refresh_service(
             let _ = event_tx.try_send(Message::ServiceDetailsRefreshed((
                 ServiceResult::Err(ServiceError {
                     service_name: service_details.name.clone(),
-                    error: format!("{:?}", error),
+                    error: format!("{error:?}"),
                     cluster_keys: service_details.cluster_keys.clone(),
                 }),
                 service_details,
