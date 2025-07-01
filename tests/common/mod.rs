@@ -1,70 +1,52 @@
-use assert_cmd::Command;
-use tempfile::{TempDir, tempdir};
+use insta_cmd::get_cargo_bin;
+use std::process::Command;
+use tempfile::TempDir;
 
-pub struct Fixture {
+#[cfg(test)]
+pub fn base_command() -> Command {
+    Command::new(get_cargo_bin("ecscope"))
+}
+
+#[cfg(test)]
+pub struct TestFixture {
     _temp_dir: TempDir,
     config_dir_path: String,
 }
 
 #[cfg(test)]
 #[allow(unused)]
-impl Fixture {
+impl TestFixture {
     pub fn new() -> Self {
-        let temp_dir = tempdir().expect("temporary directory should've been created");
-        let config_dir_path = temp_dir
+        let temp_dir = TempDir::new().expect("couldn't create temporary directory");
+        let data_file_path = temp_dir
             .path()
             .to_str()
             .expect("temporary directory path is not valid utf-8")
             .to_string();
-
         Self {
             _temp_dir: temp_dir,
-            config_dir_path,
+            config_dir_path: data_file_path,
         }
     }
 
-    pub fn command(&self) -> Command {
-        let mut command =
-            Command::cargo_bin(env!("CARGO_PKG_NAME")).expect("command should've been created");
-        command.env("XDG_CONFIG_HOME", &self.config_dir_path);
-        command
+    pub fn config_dir(&self) -> &str {
+        &self.config_dir_path
     }
-}
-
-pub trait ExpectedSuccess {
-    fn print_stderr_if_failed(&self, context: Option<&str>);
 }
 
 #[cfg(test)]
-impl ExpectedSuccess for std::process::Output {
-    fn print_stderr_if_failed(&self, context: Option<&str>) {
-        if self.status.success() {
-            return;
-        }
-
-        let stderr = std::str::from_utf8(&self.stderr).expect("invalid utf-8 stderr");
-        match context {
-            Some(c) => println!("{c} stderr: \n{stderr}"),
-            None => println!("stderr: \n{stderr}"),
-        }
-    }
-}
-
-pub trait ExpectedFailure {
-    fn print_stdout_if_succeeded(&self, context: Option<&str>);
-}
-
-#[cfg(test)]
-impl ExpectedFailure for std::process::Output {
-    fn print_stdout_if_succeeded(&self, context: Option<&str>) {
-        if !self.status.success() {
-            return;
-        }
-
-        let stdout = std::str::from_utf8(&self.stdout).expect("invalid utf-8 stdout");
-        match context {
-            Some(c) => println!("{c} stdout: \n{stdout}"),
-            None => println!("stdout: \n{stdout}"),
-        }
+#[allow(unused)]
+macro_rules! apply_common_filters {
+    {} => {
+        let mut settings = insta::Settings::clone_current();
+        // Macos Temp Folder
+        settings.add_filter(r"/var/folders/\S+?/T/\S+", "[TEMP_FILE]");
+        // Linux Temp Folder
+        settings.add_filter(r"/tmp/\.tmp\S+", "[TEMP_FILE]");
+        // Windows Temp folder
+        settings.add_filter(r"\b[A-Z]:\\.*\\Local\\Temp\\\S+", "[TEMP_FILE]");
+        // Convert windows paths to Unix Paths.
+        settings.add_filter(r"\\\\?([\w\d.])", "/$1");
+        let _bound = settings.bind_to_scope();
     }
 }

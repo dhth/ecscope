@@ -37,7 +37,7 @@ pub fn get_config_dir() -> Result<PathBuf, ConfigDirError> {
     }?;
 
     #[cfg(not(target_family = "unix"))]
-    let data_dir = dirs::config_dir().ok_or(ConfigDirError::CouldntGetConfigDir)?;
+    let config_dir = dirs::config_dir().ok_or(ConfigDirError::CouldntGetConfigDir)?;
 
     Ok(config_dir)
 }
