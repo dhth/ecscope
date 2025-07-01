@@ -34,13 +34,13 @@ fn using_regex_for_search_filter_works() {
     DEBUG INFO:
 
     [your arguments]
-    command             : Monitor resources
-    profile             : profile
-    service name filter : .*-service
-    key filter          : <not provided>
+    command:                Monitor resources
+    profile:                profile
+    service name filter:    .*-service
+    key filter:             <not provided>
 
     [computed config]
-    config directory: [TEMP_FILE]
+    config directory:    [TEMP_FILE]
 
     ----- stderr -----
     ");
@@ -72,13 +72,13 @@ fn using_regex_for_key_filter_works() {
     DEBUG INFO:
 
     [your arguments]
-    command             : Monitor resources
-    profile             : profile
-    service name filter : <not provided>
-    key filter          : qa|staging
+    command:                Monitor resources
+    profile:                profile
+    service name filter:    <not provided>
+    key filter:             qa|staging
 
     [computed config]
-    config directory: [TEMP_FILE]
+    config directory:    [TEMP_FILE]
 
     ----- stderr -----
     ");

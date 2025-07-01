@@ -7,7 +7,7 @@ pub fn display_debug_info(args: &Args, config_dir: &Path) {
 
 [your arguments]{}
 [computed config]
-config directory: {}"#,
+config directory:    {}"#,
         args,
         config_dir.to_string_lossy()
     )
