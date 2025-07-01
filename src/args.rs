@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::common::{DeploymentState, OutputFormat, OutputMode};
 use clap::{Parser, Subcommand};
 use regex::Regex;
@@ -9,6 +11,9 @@ const NOT_PROVIDED: &str = "<not provided>";
 pub struct Args {
     #[command(subcommand)]
     pub command: EcscopeCommand,
+    /// Config directory
+    #[arg(short = 'c', long = "config-dir", value_name = "PATH", global = true)]
+    pub config_dir: Option<PathBuf>,
     /// Output debug information without doing anything
     #[arg(long = "debug", global = true)]
     pub debug: bool,

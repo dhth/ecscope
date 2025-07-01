@@ -11,7 +11,10 @@ use std::sync::Arc;
 const TOOL_DIR: &str = "ecscope";
 
 pub async fn handle(args: Args) -> Result<(), AppError> {
-    let config_dir = get_config_dir()?;
+    let config_dir = match &args.config_dir {
+        Some(c) => c.clone(),
+        None => get_config_dir()?,
+    };
     let config_dir = config_dir.join(PathBuf::from(TOOL_DIR));
 
     if args.debug {

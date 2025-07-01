@@ -53,10 +53,11 @@ pub fn add_profile(
 
     println!(
         r#"Profile config file added at:
-{:?}
+{}
 
 You can edit the file in your text editor, and use it via "ecscope -p {}""#,
-        &profile_path, &profile_name
+        &profile_path.to_string_lossy(),
+        &profile_name
     );
 
     Ok(())

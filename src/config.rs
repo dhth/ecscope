@@ -7,11 +7,13 @@ use serde::{
 };
 
 #[derive(Debug, Deserialize)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct Config {
     pub clusters: Vec<ClusterConfig>,
 }
 
 #[derive(Debug, Deserialize, Clone)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub struct ClusterConfig {
     pub keys: Vec<String>,
     pub arn: String,
@@ -59,6 +61,7 @@ impl<'de> Deserialize<'de> for ConfigSource {
 }
 
 #[derive(Eq, Hash, PartialEq, Debug, Clone)]
+#[cfg_attr(test, derive(serde::Serialize))]
 pub enum ConfigSource {
     AssumeRole { role_arn: String },
     Env,
@@ -96,8 +99,9 @@ impl ClusterConfig {
 
 #[cfg(test)]
 mod tests {
+    use insta::assert_yaml_snapshot;
+
     use super::*;
-    use pretty_assertions::assert_eq;
 
     //-------------//
     //  SUCCESSES  //
@@ -143,20 +147,34 @@ config_source = "assume:arn:aws:iam::222222222222:role/role-name"
         let config: Config = toml::from_str(config).expect("config should've been deserialized");
 
         // THEN
-        assert_eq!(config.clusters.len(), 3);
-        assert_eq!(config.clusters[0].config_source, ConfigSource::Env);
-        assert_eq!(
-            config.clusters[1].config_source,
-            ConfigSource::Profile {
-                name: "qa".to_string()
-            }
-        );
-        assert_eq!(
-            config.clusters[2].config_source,
-            ConfigSource::AssumeRole {
-                role_arn: "arn:aws:iam::222222222222:role/role-name".to_string()
-            }
-        );
+        assert_yaml_snapshot!(config, @r#"
+        clusters:
+          - keys:
+              - qa
+            arn: "arn:aws:ecs:eu-central-1:111111111111:cluster/urlpreview-2-cluster-qa"
+            services:
+              - service-a
+              - service-b
+            config_source: Env
+          - keys:
+              - qa
+            arn: "arn:aws:ecs:eu-central-1:111111111111:cluster/prlserver-cluster-qa"
+            services:
+              - service-c
+              - service-d
+            config_source:
+              Profile:
+                name: qa
+          - keys:
+              - qa
+            arn: "arn:aws:ecs:eu-central-1:111111111111:cluster/prlserver-cluster-qa"
+            services:
+              - service-c
+              - service-d
+            config_source:
+              AssumeRole:
+                role_arn: "arn:aws:iam::222222222222:role/role-name"
+        "#);
     }
 
     //------------//

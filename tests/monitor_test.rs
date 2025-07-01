@@ -1,5 +1,8 @@
+#[macro_use]
 mod common;
-use common::{ExpectedFailure, ExpectedSuccess, Fixture};
+
+use common::{TestFixture, base_command};
+use insta_cmd::assert_cmd_snapshot;
 
 //-------------//
 //  SUCCESSES  //
@@ -8,31 +11,77 @@ use common::{ExpectedFailure, ExpectedSuccess, Fixture};
 #[test]
 fn using_regex_for_search_filter_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["monitor", "profile", "-s", ".*-service", "--debug"]);
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
+    let mut cmd = base_command();
+    let mut cmd = cmd.args([
+        "monitor",
+        "profile",
+        "-s",
+        ".*-service",
+        "--config-dir",
+        config_dir,
+        "--debug",
+    ]);
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-
     // THEN
-    output.print_stderr_if_failed(None);
-    assert!(output.status.success());
+    apply_common_filters!();
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    DEBUG INFO:
+
+    <your arguments>
+    command             : Monitor resources
+    profile             : profile
+    service name filter : .*-service
+    key filter          : <not provided>
+
+    <computed config>
+    config directory: [TEMP_FILE]
+
+    ----- stderr -----
+    ");
 }
 
 #[test]
 fn using_regex_for_key_filter_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["monitor", "profile", "-k", "qa|staging", "--debug"]);
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
+    let mut cmd = base_command();
+    let mut cmd = cmd.args([
+        "monitor",
+        "profile",
+        "-k",
+        "qa|staging",
+        "--config-dir",
+        config_dir,
+        "--debug",
+    ]);
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-
     // THEN
-    output.print_stderr_if_failed(None);
-    assert!(output.status.success());
+    apply_common_filters!();
+    assert_cmd_snapshot!(cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    DEBUG INFO:
+
+    <your arguments>
+    command             : Monitor resources
+    profile             : profile
+    service name filter : <not provided>
+    key filter          : qa|staging
+
+    <computed config>
+    config directory: [TEMP_FILE]
+
+    ----- stderr -----
+    ");
 }
 
 //------------//
@@ -42,29 +91,45 @@ fn using_regex_for_key_filter_works() {
 #[test]
 fn using_invalid_regex_for_search_filter_fails() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["monitor", "profile", "-s", "(a(bc", "--debug"]);
+    let mut cmd = base_command();
+    let mut cmd = cmd.args(["monitor", "profile", "-s", "(a(bc", "--debug"]);
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-
     // THEN
-    output.print_stdout_if_succeeded(None);
-    assert!(!output.status.success());
+    assert_cmd_snapshot!(cmd, @r#"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: invalid value '(a(bc' for '--service-filter <REGEX>': query "(a(bc" is not valid regex: regex parse error:
+        (a(bc
+          ^
+    error: unclosed group
+
+    For more information, try '--help'.
+    "#);
 }
 
 #[test]
 fn using_invalid_regex_for_key_filter_fails() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["monitor", "profile", "-k", "(a(bc", "--debug"]);
+    let mut cmd = base_command();
+    let mut cmd = cmd.args(["monitor", "profile", "-k", "(a(bc", "--debug"]);
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-
     // THEN
-    output.print_stdout_if_succeeded(None);
-    assert!(!output.status.success());
+    assert_cmd_snapshot!(cmd, @r#"
+    success: false
+    exit_code: 2
+    ----- stdout -----
+
+    ----- stderr -----
+    error: invalid value '(a(bc' for '--key-filter <REGEX>': query "(a(bc" is not valid regex: regex parse error:
+        (a(bc
+          ^
+    error: unclosed group
+
+    For more information, try '--help'.
+    "#);
 }

@@ -1,6 +1,8 @@
+#[macro_use]
 mod common;
-use common::{ExpectedFailure, ExpectedSuccess, Fixture};
-use pretty_assertions::assert_eq;
+
+use common::{TestFixture, base_command};
+use insta_cmd::assert_cmd_snapshot;
 
 //-------------//
 //  SUCCESSES  //
@@ -9,30 +11,54 @@ use pretty_assertions::assert_eq;
 #[test]
 fn adding_a_profile_works() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["profiles", "add", "prof1"]);
-    let mut cmd_two = fixture.command();
-    cmd_two.args(["profiles", "add", "prof2"]);
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-    let output_two = cmd_two.output().expect("command two should've run");
+    let mut add_cmd_one = base_command();
+    let mut add_cmd_one =
+        add_cmd_one.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
+
+    let mut add_cmd_two = base_command();
+    let mut add_cmd_two =
+        add_cmd_two.args(["profiles", "add", "prof2", "--config-dir", config_dir]);
+
+    let mut show_cmd = base_command();
+    let mut show_cmd = show_cmd.args(["profiles", "list", "--config-dir", config_dir]);
 
     // THEN
-    output.print_stderr_if_failed(None);
-    assert!(output.status.success());
-    output_two.print_stderr_if_failed(None);
-    assert!(output_two.status.success());
+    apply_common_filters!();
+    assert_cmd_snapshot!(add_cmd_one, @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    Profile config file added at:
+    [TEMP_FILE]
 
-    let mut list_cmd = fixture.command();
-    list_cmd.args(["profiles", "list"]);
-    let list_output = list_cmd.output().expect("list command should've run");
-    assert!(list_output.status.success());
-    let list_stdout = String::from_utf8(list_output.stdout).expect("invalid utf-8 stdout");
-    assert_eq!(list_stdout.lines().count(), 2);
-    assert!(list_stdout.contains("prof1"));
-    assert!(list_stdout.contains("prof2"));
+    You can edit the file in your text editor, and use it via "ecscope -p prof1"
+
+    ----- stderr -----
+    "#);
+    assert_cmd_snapshot!(add_cmd_two, @r#"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    Profile config file added at:
+    [TEMP_FILE]
+
+    You can edit the file in your text editor, and use it via "ecscope -p prof2"
+
+    ----- stderr -----
+    "#);
+    assert_cmd_snapshot!(show_cmd, @r"
+    success: true
+    exit_code: 0
+    ----- stdout -----
+    prof1	(located at [TEMP_FILE]
+    prof2	(located at [TEMP_FILE]
+
+    ----- stderr -----
+    ");
 }
 
 //------------//
@@ -42,34 +68,47 @@ fn adding_a_profile_works() {
 #[test]
 fn using_incorrect_profile_name_fails() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["profiles", "add", "split in three"]);
+    let mut cmd = base_command();
+    let mut cmd = cmd.args(["profiles", "add", "split in three"]);
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-
     // THEN
-    output.print_stdout_if_succeeded(None);
-    assert!(!output.status.success());
+    assert_cmd_snapshot!(cmd, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: profile name is invalid; valid regex: ^[a-z0-9_-]{1,20}$
+    ");
 }
 
 #[test]
 fn adding_duplicate_profile_fails() {
     // GIVEN
-    let fixture = Fixture::new();
-    let mut cmd = fixture.command();
-    cmd.args(["profiles", "add", "prof1"]);
-    let mut cmd_two = fixture.command();
-    cmd_two.args(["profiles", "add", "prof1"]);
+    let mut cmd_one = base_command();
+    let mut add_cmd_one = cmd_one.args(["profiles", "add", "prof1"]);
+
+    assert_cmd_snapshot!(add_cmd_one, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: profile already exists
+    ");
 
     // WHEN
-    let output = cmd.output().expect("command should've run");
-    let output_two = cmd_two.output().expect("command two should've run");
+    let mut cmd = base_command();
+    let mut cmd = cmd.args(["profiles", "add", "prof1"]);
 
     // THEN
-    output.print_stderr_if_failed(None);
-    assert!(output.status.success());
-    output_two.print_stdout_if_succeeded(None);
-    assert!(!output_two.status.success());
+    assert_cmd_snapshot!(cmd, @r"
+    success: false
+    exit_code: 1
+    ----- stdout -----
+
+    ----- stderr -----
+    Error: profile already exists
+    ");
 }
