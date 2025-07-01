@@ -100,14 +100,14 @@ impl std::fmt::Display for Args {
                 web_skip_opening,
             } => format!(
                 r#"
-command                  : List Deployments
-profile                  : {}
-service name filter      : {}
-key filter               : {}
-state                    : {}
-format                   : {}
-mode                     : {}
-skip opening web results : {}
+command:                     List Deployments
+profile:                     {}
+service name filter:         {}
+key filter:                  {}
+state:                       {}
+format:                      {}
+mode:                        {}
+skip opening web results:    {}
 "#,
                 profile_name,
                 service_name_filter
@@ -122,12 +122,12 @@ skip opening web results : {}
             EcscopeCommand::Profiles { profiles_command } => match profiles_command {
                 ProfilesCommand::Add { name } => format!(
                     r#"
-command           : Add Profile
-name              : {name}
+command:    Add Profile
+name:       {name}
 "#
                 ),
                 ProfilesCommand::List => r#"
-command           : List Profiles
+command:    List Profiles
 "#
                 .to_string(),
             },
@@ -137,10 +137,10 @@ command           : List Profiles
                 key_filter,
             } => format!(
                 r#"
-command             : Monitor resources
-profile             : {}
-service name filter : {}
-key filter          : {}
+command:                Monitor resources
+profile:                {}
+service name filter:    {}
+key filter:             {}
 "#,
                 profile_name,
                 service_name_filter
