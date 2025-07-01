@@ -33,13 +33,13 @@ fn using_regex_for_search_filter_works() {
     ----- stdout -----
     DEBUG INFO:
 
-    <your arguments>
+    [your arguments]
     command             : Monitor resources
     profile             : profile
     service name filter : .*-service
     key filter          : <not provided>
 
-    <computed config>
+    [computed config]
     config directory: [TEMP_FILE]
 
     ----- stderr -----
@@ -71,13 +71,13 @@ fn using_regex_for_key_filter_works() {
     ----- stdout -----
     DEBUG INFO:
 
-    <your arguments>
+    [your arguments]
     command             : Monitor resources
     profile             : profile
     service name filter : <not provided>
     key filter          : qa|staging
 
-    <computed config>
+    [computed config]
     config directory: [TEMP_FILE]
 
     ----- stderr -----
@@ -91,8 +91,18 @@ fn using_regex_for_key_filter_works() {
 #[test]
 fn using_invalid_regex_for_search_filter_fails() {
     // GIVEN
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
     let mut cmd = base_command();
-    let mut cmd = cmd.args(["monitor", "profile", "-s", "(a(bc", "--debug"]);
+    let mut cmd = cmd.args([
+        "monitor",
+        "profile",
+        "-s",
+        "(a(bc",
+        "--debug",
+        "--config-dir",
+        config_dir,
+    ]);
 
     // WHEN
     // THEN
@@ -114,8 +124,18 @@ fn using_invalid_regex_for_search_filter_fails() {
 #[test]
 fn using_invalid_regex_for_key_filter_fails() {
     // GIVEN
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
     let mut cmd = base_command();
-    let mut cmd = cmd.args(["monitor", "profile", "-k", "(a(bc", "--debug"]);
+    let mut cmd = cmd.args([
+        "monitor",
+        "profile",
+        "-k",
+        "(a(bc",
+        "--debug",
+        "--config-dir",
+        config_dir,
+    ]);
 
     // WHEN
     // THEN

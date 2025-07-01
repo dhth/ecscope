@@ -30,7 +30,7 @@ fn shows_help() {
       help      Print this message or the help of the given subcommand(s)
 
     Options:
-      -c, --config-dir <PATH>  Config directory
+      -c, --config-dir <PATH>  Config directory (to override ecscope's default config directory)
           --debug              Output debug information without doing anything
       -h, --help               Print help
 

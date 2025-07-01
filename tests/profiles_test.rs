@@ -68,8 +68,16 @@ fn adding_a_profile_works() {
 #[test]
 fn using_incorrect_profile_name_fails() {
     // GIVEN
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
     let mut cmd = base_command();
-    let mut cmd = cmd.args(["profiles", "add", "split in three"]);
+    let mut cmd = cmd.args([
+        "profiles",
+        "add",
+        "split in three",
+        "--config-dir",
+        config_dir,
+    ]);
 
     // WHEN
     // THEN
@@ -86,21 +94,27 @@ fn using_incorrect_profile_name_fails() {
 #[test]
 fn adding_duplicate_profile_fails() {
     // GIVEN
-    let mut cmd_one = base_command();
-    let mut add_cmd_one = cmd_one.args(["profiles", "add", "prof1"]);
+    let fixture = TestFixture::new();
+    let config_dir = fixture.config_dir();
+    let mut add_cmd = base_command();
+    let mut cmd_one = add_cmd.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
 
-    assert_cmd_snapshot!(add_cmd_one, @r"
-    success: false
-    exit_code: 1
+    apply_common_filters!();
+    assert_cmd_snapshot!(cmd_one, @r#"
+    success: true
+    exit_code: 0
     ----- stdout -----
+    Profile config file added at:
+    [TEMP_FILE]
+
+    You can edit the file in your text editor, and use it via "ecscope -p prof1"
 
     ----- stderr -----
-    Error: profile already exists
-    ");
+    "#);
 
     // WHEN
     let mut cmd = base_command();
-    let mut cmd = cmd.args(["profiles", "add", "prof1"]);
+    let mut cmd = cmd.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
 
     // THEN
     assert_cmd_snapshot!(cmd, @r"

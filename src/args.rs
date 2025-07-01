@@ -11,7 +11,7 @@ const NOT_PROVIDED: &str = "<not provided>";
 pub struct Args {
     #[command(subcommand)]
     pub command: EcscopeCommand,
-    /// Config directory
+    /// Config directory (to override ecscope's default config directory)
     #[arg(short = 'c', long = "config-dir", value_name = "PATH", global = true)]
     pub config_dir: Option<PathBuf>,
     /// Output debug information without doing anything
