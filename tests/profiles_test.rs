@@ -1,7 +1,7 @@
 #[macro_use]
 mod common;
 
-use common::{TestFixture, base_command};
+use common::Fixture;
 use insta_cmd::assert_cmd_snapshot;
 
 //-------------//
@@ -11,20 +11,12 @@ use insta_cmd::assert_cmd_snapshot;
 #[test]
 fn adding_a_profile_works() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
+    let fx = Fixture::new();
 
     // WHEN
-    let mut add_cmd_one = base_command();
-    let mut add_cmd_one =
-        add_cmd_one.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
-
-    let mut add_cmd_two = base_command();
-    let mut add_cmd_two =
-        add_cmd_two.args(["profiles", "add", "prof2", "--config-dir", config_dir]);
-
-    let mut show_cmd = base_command();
-    let mut show_cmd = show_cmd.args(["profiles", "list", "--config-dir", config_dir]);
+    let mut add_cmd_one = fx.cmd(["profiles", "add", "prof1"]);
+    let mut add_cmd_two = fx.cmd(["profiles", "add", "prof2"]);
+    let mut show_cmd = fx.cmd(["profiles", "list"]);
 
     // THEN
     apply_common_filters!();
@@ -68,16 +60,8 @@ fn adding_a_profile_works() {
 #[test]
 fn using_incorrect_profile_name_fails() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut cmd = base_command();
-    let mut cmd = cmd.args([
-        "profiles",
-        "add",
-        "split in three",
-        "--config-dir",
-        config_dir,
-    ]);
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["profiles", "add", "split in three"]);
 
     // WHEN
     // THEN
@@ -94,10 +78,8 @@ fn using_incorrect_profile_name_fails() {
 #[test]
 fn adding_duplicate_profile_fails() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut add_cmd = base_command();
-    let mut cmd_one = add_cmd.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
+    let fx = Fixture::new();
+    let mut cmd_one = fx.cmd(["profiles", "add", "prof1"]);
 
     apply_common_filters!();
     assert_cmd_snapshot!(cmd_one, @r#"
@@ -113,8 +95,7 @@ fn adding_duplicate_profile_fails() {
     "#);
 
     // WHEN
-    let mut cmd = base_command();
-    let mut cmd = cmd.args(["profiles", "add", "prof1", "--config-dir", config_dir]);
+    let mut cmd = fx.cmd(["profiles", "add", "prof1"]);
 
     // THEN
     assert_cmd_snapshot!(cmd, @r"

@@ -1,7 +1,7 @@
 #[macro_use]
 mod common;
 
-use common::{TestFixture, base_command};
+use common::Fixture;
 use insta_cmd::assert_cmd_snapshot;
 
 //-------------//
@@ -11,18 +11,8 @@ use insta_cmd::assert_cmd_snapshot;
 #[test]
 fn using_regex_for_search_filter_works() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut cmd = base_command();
-    let mut cmd = cmd.args([
-        "monitor",
-        "profile",
-        "-s",
-        ".*-service",
-        "--config-dir",
-        config_dir,
-        "--debug",
-    ]);
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["monitor", "profile", "-s", ".*-service", "--debug"]);
 
     // WHEN
     // THEN
@@ -49,18 +39,8 @@ fn using_regex_for_search_filter_works() {
 #[test]
 fn using_regex_for_key_filter_works() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut cmd = base_command();
-    let mut cmd = cmd.args([
-        "monitor",
-        "profile",
-        "-k",
-        "qa|staging",
-        "--config-dir",
-        config_dir,
-        "--debug",
-    ]);
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["monitor", "profile", "-k", "qa|staging", "--debug"]);
 
     // WHEN
     // THEN
@@ -91,18 +71,8 @@ fn using_regex_for_key_filter_works() {
 #[test]
 fn using_invalid_regex_for_search_filter_fails() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut cmd = base_command();
-    let mut cmd = cmd.args([
-        "monitor",
-        "profile",
-        "-s",
-        "(a(bc",
-        "--debug",
-        "--config-dir",
-        config_dir,
-    ]);
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["monitor", "profile", "-s", "(a(bc", "--debug"]);
 
     // WHEN
     // THEN
@@ -124,18 +94,8 @@ fn using_invalid_regex_for_search_filter_fails() {
 #[test]
 fn using_invalid_regex_for_key_filter_fails() {
     // GIVEN
-    let fixture = TestFixture::new();
-    let config_dir = fixture.config_dir();
-    let mut cmd = base_command();
-    let mut cmd = cmd.args([
-        "monitor",
-        "profile",
-        "-k",
-        "(a(bc",
-        "--debug",
-        "--config-dir",
-        config_dir,
-    ]);
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["monitor", "profile", "-k", "(a(bc", "--debug"]);
 
     // WHEN
     // THEN
