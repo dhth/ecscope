@@ -1,6 +1,6 @@
 mod common;
 
-use common::base_command;
+use common::Fixture;
 use insta_cmd::assert_cmd_snapshot;
 
 //-------------//
@@ -10,8 +10,8 @@ use insta_cmd::assert_cmd_snapshot;
 #[test]
 fn shows_help() {
     // GIVEN
-    let mut cmd = base_command();
-    let mut cmd = cmd.arg("--help");
+    let fx = Fixture::new();
+    let mut cmd = fx.cmd(["--help"]);
 
     // WHEN
     // THEN

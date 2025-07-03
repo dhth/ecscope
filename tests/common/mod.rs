@@ -1,36 +1,47 @@
 use insta_cmd::get_cargo_bin;
-use std::process::Command;
-use tempfile::TempDir;
+use std::{ffi::OsStr, path::PathBuf, process::Command};
+use tempfile::{TempDir, tempdir};
 
-#[cfg(test)]
-pub fn base_command() -> Command {
-    Command::new(get_cargo_bin("ecscope"))
-}
-
-#[cfg(test)]
-pub struct TestFixture {
+pub struct Fixture {
+    _bin_path: PathBuf,
     _temp_dir: TempDir,
     config_dir_path: String,
 }
 
 #[cfg(test)]
 #[allow(unused)]
-impl TestFixture {
+impl Fixture {
     pub fn new() -> Self {
-        let temp_dir = TempDir::new().expect("couldn't create temporary directory");
-        let data_file_path = temp_dir
+        let bin_path = get_cargo_bin("ecscope");
+        let temp_dir = tempdir().expect("temporary directory should've been created");
+        let config_dir_path = temp_dir
             .path()
             .to_str()
             .expect("temporary directory path is not valid utf-8")
             .to_string();
+
         Self {
+            _bin_path: bin_path,
             _temp_dir: temp_dir,
-            config_dir_path: data_file_path,
+            config_dir_path,
         }
     }
 
-    pub fn config_dir(&self) -> &str {
-        &self.config_dir_path
+    pub fn base_cmd(&self) -> Command {
+        let mut cmd = Command::new(&self._bin_path);
+        cmd.args(["--config-dir", &self.config_dir_path]);
+        cmd
+    }
+
+    pub fn cmd<I, S>(&self, args: I) -> Command
+    where
+        I: IntoIterator<Item = S>,
+        S: AsRef<OsStr>,
+    {
+        let mut command = Command::new(&self._bin_path);
+        command.args(args);
+        command.args(["--config-dir", &self.config_dir_path]);
+        command
     }
 }
 
