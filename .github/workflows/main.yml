@@ -14,9 +14,10 @@ jobs:
     permissions:
       contents: read
     outputs:
+      gleam: ${{ steps.filter.outputs.gleam }}
+      publish: ${{ steps.filter.outputs.publish }}
       rust: ${{ steps.filter.outputs.rust }}
       rust-deps: ${{ steps.filter.outputs.rust-deps }}
-      gleam: ${{ steps.filter.outputs.gleam }}
       workflows: ${{ steps.filter.outputs.workflows }}
       yml: ${{ steps.filter.outputs.yml }}
     steps:
@@ -30,13 +31,17 @@ jobs:
               - "src/server/deployments/client/**"
               - ".github/actions/**/*.yml"
               - ".github/workflows/main.yml"
+            publish:
+              - "src/server/deployments/client/**"
+              - "Cargo.toml"
+              - ".github/workflows/main.yml"
             rust:
               - "src/**"
               - "**/*.rs"
-              - Cargo.*
-              - clippy.toml
-              - dist-workspace.toml
-              - rust-toolchain.toml
+              - "Cargo.*"
+              - "clippy.toml"
+              - "dist-workspace.toml"
+              - "rust-toolchain.toml"
               - ".github/actions/**/*.yml"
               - ".github/workflows/main.yml"
             rust-deps:
@@ -209,3 +214,14 @@ jobs:
           repo: EmbarkStudios/cargo-deny
       - name: cargo deny
         run: cargo deny check
+
+  publish-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.publish == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: cargo publish check
+        run: cargo publish --dry-run
