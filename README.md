@@ -12,11 +12,12 @@
 
 ![tui](https://tools.dhruvs.space/images/ecscope/ecscope.png)
 
-It does so by offering a TUI which shows services, tasks and containers in a
-single view. Instead of having to log into several accounts (or change regions)
-via the AWS website, you're able to view relevant information for ECS
-deployments in one place. You can group services by configuring them via a
-"profile", and have `ecscope` load it up.
+It does so by offering a [TUI](#-monitoring-tui) which shows services, tasks and
+containers in a single view. Instead of having to log into several accounts (or
+change regions) via the AWS website, you're able to view relevant information
+for ECS deployments in one place. You can group services by configuring them via
+a "profile", and have `ecscope` load it up. Besides the TUI, `ecscope` can also
+show deployments updates via a minimal [web interface](#web-ui).
 
 💾 Installation
 ---
