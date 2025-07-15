@@ -11,6 +11,7 @@
 `ecscope` lets you monitor AWS ECS resources from the terminal.
 
 ![tui](https://tools.dhruvs.space/images/ecscope/ecscope.png)
+![web-2](https://tools.dhruvs.space/images/ecscope/web-2.png)
 
 It does so by offering a [TUI](#-monitoring-tui) which shows services, tasks and
 containers in a single view. Instead of having to log into several accounts (or
@@ -258,7 +259,7 @@ ecscope deps <PROFILE> -s auth -f delimited |
 Deployments can also be viewed through a web UI (using `--mode web`). This
 allows you to monitor deployment status in real time with a simple interface.
 
-![web-1](https://tools.dhruvs.space/images/ecscope/web-1.png)
+![web](https://tools.dhruvs.space/images/ecscope/web.png)
 ![web-2](https://tools.dhruvs.space/images/ecscope/web-2.png)
 
 📟 Monitoring TUI
