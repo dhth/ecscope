@@ -18,6 +18,8 @@ categories = [
 exclude = [
     ".github",
     "src/server/deployments/client",
+    "!src/server/deployments/client/index.html",
+    "!src/server/deployments/client/priv",
 ]
 
 [dependencies]
