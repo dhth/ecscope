@@ -10,7 +10,7 @@
 
 `ecscope` lets you monitor AWS ECS resources from the terminal.
 
-![tui](https://github.com/user-attachments/assets/c7d7f005-f582-4eff-a685-dc8d3c8e0b61)
+![tui](https://tools.dhruvs.space/images/ecscope/ecscope.png)
 
 It does so by offering a TUI which shows services, tasks and containers in a
 single view. Instead of having to log into several accounts (or change regions)
@@ -153,9 +153,12 @@ Arguments:
 Options:
   -s, --service-filter <REGEX>  Filtration query for service names
   -k, --key-filter <REGEX>      Filtration query for cluster keys
-      --state <STRING>          Deployment state to query for [possible values: finished, pending, failing]
-      --debug                   Output debug information without doing anything
+  -S, --state <STRING>          Deployment state to query for [possible values: finished, in-progress, failing]
+  -c, --config-dir <PATH>       Config directory (to override ecscope's default config directory)
   -f, --format <STRING>         Format to use [default: json] [possible values: delimited, json, plain]
+      --debug                   Output debug information without doing anything
+  -m, --mode <STRING>           Output mode [default: default] [possible values: default, web]
+      --web-skip-opening        Whether to skip opening web results in browser (when --mode=web)
   -h, --help                    Print help (see more with '--help')
 ```
 
@@ -236,7 +239,7 @@ You can view the output of `deps` command as a table as follows (uses
 ```bash
 ecscope deps <PROFILE> -s auth -f delimited |
     (read -r header && echo "$header" && sort) |
-    tbll -c 0,1,4,5,6,7,8
+    tbll -C 2,3
 ```
 
 ```text
@@ -248,6 +251,14 @@ ecscope deps <PROFILE> -s auth -f delimited |
 │ authentication-service │ staging │ PRIMARY │ 1             │ 1             │ 0             │ 0            │
 └────────────────────────┴─────────┴─────────┴───────────────┴───────────────┴───────────────┴──────────────┘
 ```
+
+### Web UI
+
+Deployments can also be viewed through a web UI (using `--mode web`). This
+allows you to monitor deployment status in real time with a simple interface.
+
+![web-1](https://tools.dhruvs.space/images/ecscope/web-1.png)
+![web-2](https://tools.dhruvs.space/images/ecscope/web-2.png)
 
 📟 Monitoring TUI
 ---
