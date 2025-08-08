@@ -1,12 +1,5 @@
 use crate::config::ConfigSource;
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-#[allow(dead_code)]
-pub struct Service {
-    pub name: String,
-    pub cluster_arn: String,
-}
-
 pub type ServiceResult = Result<ServiceDetails, ServiceError>;
 
 #[derive(Debug, Clone)]
