@@ -110,22 +110,21 @@ pub fn update(model: &mut Model, msg: Message) -> Vec<Command> {
                 } else {
                     for (index, service_result) in model.service_items.items.iter_mut().enumerate()
                     {
-                        if service_result.marked_for_refresh {
-                            if let Ok(service_details) = &service_result.service {
+                        if service_result.marked_for_refresh
+                            && let Ok(service_details) = &service_result.service {
                                 cmds.push(Command::RefreshService((
                                     service_details.clone(),
                                     index,
                                 )));
                                 model.task_results_cache.remove(service_details);
                             }
-                        }
                     }
                 }
             }
         },
         Message::ToggleServiceRefresh => {
-            if let Some(index) = model.service_items.state.selected() {
-                if let Some(service_item) = model.service_items.items.get_mut(index) {
+            if let Some(index) = model.service_items.state.selected()
+                && let Some(service_item) = model.service_items.items.get_mut(index) {
                     if service_item.service.is_ok() {
                         if service_item.marked_for_refresh {
                             service_item.marked_for_refresh = false;
@@ -140,7 +139,6 @@ pub fn update(model: &mut Model, msg: Message) -> Vec<Command> {
                         ));
                     }
                 }
-            }
         }
         Message::ToggleAutoRefresh => model.auto_refresh = !model.auto_refresh,
         Message::GoBackOrQuit => model.go_back_or_quit(),
@@ -177,14 +175,12 @@ pub fn update(model: &mut Model, msg: Message) -> Vec<Command> {
                 }
             }
         }
-    } else if let Some(i) = &model.task_items {
-        if task_index_before_update != i.state.selected() {
-            if let Some(selected_task) = model.get_selected_task() {
+    } else if let Some(i) = &model.task_items
+        && task_index_before_update != i.state.selected()
+            && let Some(selected_task) = model.get_selected_task() {
                 let container_items = ContainerItems::from(selected_task.containers());
                 model.container_items = container_items;
             }
-        }
-    }
 
     cmds
 }
