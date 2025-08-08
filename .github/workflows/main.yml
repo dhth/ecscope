@@ -29,7 +29,6 @@ jobs:
           filters: |
             gleam:
               - "src/server/deployments/client/**"
-              - ".github/actions/**/*.yml"
               - ".github/workflows/main.yml"
             publish:
               - "src/server/deployments/client/**"
@@ -42,7 +41,6 @@ jobs:
               - "clippy.toml"
               - "dist-workspace.toml"
               - "rust-toolchain.toml"
-              - ".github/actions/**/*.yml"
               - ".github/workflows/main.yml"
             rust-deps:
               - "Cargo.toml"
