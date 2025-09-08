@@ -45,7 +45,7 @@ toml = {version = "0.9.5", features = ["parse"] }
 tower-http = { version = "0.6.6", features = ["cors", "fs"] }
 
 [dev-dependencies]
-insta = { version = "1.43.1", features = ["yaml", "filters"] }
+insta = { version = "1.43.2", features = ["yaml", "filters"] }
 insta-cmd = "0.6.0"
 tempfile = "3.21.0"
 
