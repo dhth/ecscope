@@ -11,7 +11,7 @@ jobs:
     runs-on: "ubuntu-22.04"
     outputs:
       val: ${{ steps.plan.outputs.manifest }}
-      tag-flag: "--tag=v0.1.0"
+      tag-flag: "--tag=v0.1.0" # hardcoded tag
       publishing: true
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
