@@ -6,7 +6,7 @@ on:
     - cron: '0 7 11 * *'
 
 env:
-  TAG_FLAG: '--tag=v0.1.0'
+  TAG_FLAG: '--tag=v0.4.0'
 
 jobs:
   # Run 'dist plan' (or host) to determine what tasks we need to do
