@@ -23,7 +23,7 @@ exclude = [
 ]
 
 [dependencies]
-anyhow = "1.0.99"
+anyhow = "1.0.100"
 aws-config = { version = "1.6.1", features = ["behavior-version-latest"] }
 aws-sdk-ecs = "1.74.0"
 axum = "0.8.4"
