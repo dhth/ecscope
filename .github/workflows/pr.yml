@@ -20,7 +20,7 @@ jobs:
       yml: ${{ steps.filter.outputs.yml }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -56,7 +56,7 @@ jobs:
     if: ${{ needs.changes.outputs.rust == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -71,7 +71,7 @@ jobs:
     if: ${{ needs.changes.outputs.gleam == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "27.1.2"
@@ -91,7 +91,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Build
@@ -102,7 +102,7 @@ jobs:
     if: ${{ needs.changes.outputs.gleam == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "27.1.2"
@@ -129,7 +129,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install nextest
@@ -146,7 +146,7 @@ jobs:
     if: ${{ needs.changes.outputs.gleam == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: erlef/setup-beam@v1
         with:
           otp-version: "27.1.2"
@@ -163,7 +163,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: dhth/composite-actions/.github/actions/lint-yaml@main
 
   lint-workflows:
@@ -172,7 +172,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - uses: dhth/composite-actions/.github/actions/lint-actions@main
 
   back-compat:
@@ -184,14 +184,14 @@ jobs:
     steps:
       - name: Install rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           ref: main
       - name: Build main
         run: cargo build --target-dir /var/tmp/main
       - name: Add profile with ecscope on main
         run: /var/tmp/main/debug/ecscope profiles add prof1
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Build head
         run: cargo build --target-dir /var/tmp/head
       - name: Run ecscope on head
@@ -205,7 +205,7 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - id: get-dstlled-diff
@@ -221,7 +221,7 @@ jobs:
     if: ${{ needs.changes.outputs.rust-deps == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: Install cargo-deny
@@ -236,7 +236,7 @@ jobs:
     if: ${{ needs.changes.outputs.publish == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
       - name: cargo publish check
