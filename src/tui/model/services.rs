@@ -77,7 +77,7 @@ impl ServiceItems {
             }
         };
 
-        self.state = self.state.clone().with_selected(selected);
+        self.state = self.state.with_selected(selected);
     }
 }
 
