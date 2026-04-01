@@ -24,8 +24,8 @@ exclude = [
 
 [dependencies]
 anyhow = "1.0.100"
-aws-config = { version = "1.6.1", features = ["behavior-version-latest"] }
-aws-sdk-ecs = "1.74.0"
+aws-config = { version = "1.8.15", features = ["behavior-version-latest"] }
+aws-sdk-ecs = "1.119.0"
 axum = "0.8.8"
 clap = { version = "4.5.56", features = ["derive"] }
 csv = "1.4.0"
