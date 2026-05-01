@@ -41,7 +41,7 @@ serde_json = "1.0.149"
 tempfile = "3.27.0"
 thiserror = "2.0.18"
 tokio = { version = "1.50.0", features = ["full"] }
-toml = {version = "0.9.11", features = ["parse"] }
+toml = {version = "1.1.2", features = ["parse"] }
 tower-http = { version = "0.6.8", features = ["cors", "fs"] }
 
 [dev-dependencies]
