@@ -25,7 +25,7 @@ exclude = [
 [dependencies]
 anyhow = "1.0.102"
 aws-config = { version = "1.8.15", default-features = false, features = ["behavior-version-latest", "credentials-process", "default-https-client", "rt-tokio", "sso"] }
-aws-sdk-ecs = { version = "1.120.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
+aws-sdk-ecs = { version = "1.122.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 axum = "0.8.8"
 clap = { version = "4.6.0", features = ["derive"] }
 csv = "1.4.0"
