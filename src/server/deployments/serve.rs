@@ -9,7 +9,7 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::Response;
 use axum::response::{Html, IntoResponse};
 use axum::{Router, routing::get};
-use rand::Rng;
+use rand::RngExt;
 use std::collections::HashMap;
 use std::io::Error as IOError;
 use std::sync::Arc;
